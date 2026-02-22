@@ -1,222 +1,385 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Form, Button, Spinner } from 'react-bootstrap';
-import { CloudUpload, FileEarmark, FileEarmarkText, Trash } from 'react-bootstrap-icons';
+import { ArrowLeft, ArrowRight, CloudUpload, GripVertical, Trash, Images } from 'react-bootstrap-icons';
 import { uploadArtifactFile } from '../utils/imageUpload';
-import { getThumbnailUrl } from '../utils/artifactUtils';
 import ArtifactModal from './ArtifactModal';
 import type { ArtifactProps } from './Artifact';
 
-function extractGoogleSlidesId(url: string): string | null {
-    const match = url.match(/docs\.google\.com\/presentation\/d\/([a-zA-Z0-9_-]+)/) ||
-        url.match(/docs\.google\.com\/presentation\/e\/([a-zA-Z0-9_-]+)/);
-    return match ? match[1] : null;
-}
-
-function generateGoogleSlidesEmbed(presentationId: string): string {
-    return `<iframe src="https://docs.google.com/presentation/d/${presentationId}/embed?start=false&loop=false&delayms=3000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>`;
-}
-
-interface UploadedFile {
-    name: string;
+interface SlideEntry {
     url: string;
-    type: string;
+    uploading?: boolean;
 }
 
-function getGoogleSlidesUrlFromEmbed(content: string): string | null {
-    const match = content.match(/docs\.google\.com\/presentation\/d\/([a-zA-Z0-9_-]+)/) ||
-        content.match(/docs\.google\.com\/presentation\/e\/([a-zA-Z0-9_-]+)/);
-    return match ? `https://docs.google.com/presentation/d/${match[1]}` : null;
+function parseSlidesContent(content: string): string[] | null {
+    try {
+        const parsed = JSON.parse(content);
+        if (parsed?.slides && Array.isArray(parsed.slides)) {
+            return parsed.slides.filter((s: unknown) => typeof s === 'string');
+        }
+    } catch { /* not JSON — legacy HTML */ }
+    return null;
 }
+
+// ---------------------------------------------------------------------------
+// Editor
+// ---------------------------------------------------------------------------
 
 export interface ArtifactSlideshowEditorProps {
     exhibitId: number;
     content: string;
     onContentChange: (content: string) => void;
-    /** When editing, pass existing content to prefill URL field */
-    initialContent?: string;
 }
 
-export function ArtifactSlideshowEditor({ exhibitId, content, onContentChange, initialContent }: ArtifactSlideshowEditorProps) {
-    const initialUrl = initialContent ? getGoogleSlidesUrlFromEmbed(initialContent) : null;
-    const isFromUpload = initialContent && !initialUrl && (initialContent.includes('<iframe') || initialContent.includes('artifact-file-card'));
-    const [slideshowUrl, setSlideshowUrl] = useState(initialUrl ?? '');
-    const [inputMode, setInputMode] = useState<'url' | 'upload'>(initialUrl ? 'url' : isFromUpload ? 'upload' : 'url');
-    const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-    const [uploading, setUploading] = useState(false);
+const TRANSPARENT_IMG = (() => {
+    const img = new Image();
+    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    return img;
+})();
+
+export function ArtifactSlideshowEditor({ exhibitId, content, onContentChange }: ArtifactSlideshowEditorProps) {
+    const [slides, setSlides] = useState<SlideEntry[]>(() => {
+        const urls = parseSlidesContent(content);
+        return urls ? urls.map(url => ({ url })) : [];
+    });
     const [dragActive, setDragActive] = useState(false);
+    const [dragIdx, setDragIdx] = useState<number | null>(null);
+    const [dropTargetIdx, setDropTargetIdx] = useState<number | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleFileUpload = useCallback(async (files: FileList | File[]) => {
-        const fileArray = Array.from(files).filter(f =>
-            f.type === 'application/pdf' || f.name.toLowerCase().match(/\.(pdf|ppt|pptx)$/)
-        );
-        if (fileArray.length === 0) return;
+    const syncContent = useCallback((entries: SlideEntry[]) => {
+        const urls = entries.filter(e => !e.uploading).map(e => e.url);
+        onContentChange(urls.length ? JSON.stringify({ slides: urls }) : '');
+    }, [onContentChange]);
 
-        setUploading(true);
-        try {
-            const newFiles: UploadedFile[] = [];
-            for (const file of fileArray) {
-                const url = await uploadArtifactFile(file, exhibitId);
-                newFiles.push({ name: file.name, url, type: file.type });
+    const handleFiles = useCallback(async (files: FileList | File[]) => {
+        const images = Array.from(files).filter(f => f.type.startsWith('image/'));
+        if (images.length === 0) return;
+
+        const placeholders: SlideEntry[] = images.map(f => ({
+            url: URL.createObjectURL(f),
+            uploading: true,
+        }));
+
+        setSlides(prev => {
+            const next = [...prev, ...placeholders];
+            return next;
+        });
+
+        for (let i = 0; i < images.length; i++) {
+            try {
+                const url = await uploadArtifactFile(images[i], exhibitId);
+                setSlides(prev => {
+                    const idx = prev.indexOf(placeholders[i]);
+                    if (idx === -1) return prev;
+                    const next = [...prev];
+                    URL.revokeObjectURL(placeholders[i].url);
+                    next[idx] = { url };
+                    syncContent(next);
+                    return next;
+                });
+            } catch (err) {
+                console.error('Failed to upload slide image:', err);
+                setSlides(prev => {
+                    const idx = prev.indexOf(placeholders[i]);
+                    if (idx === -1) return prev;
+                    URL.revokeObjectURL(placeholders[i].url);
+                    const next = prev.filter((_, j) => j !== idx);
+                    syncContent(next);
+                    return next;
+                });
             }
-            setUploadedFiles(prev => [...prev, ...newFiles]);
-            const uploadedFile = newFiles[0];
-            if (uploadedFile) {
-                const file = fileArray[0]!;
-                const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-                const isOffice = file.type.includes('presentation') || file.name.toLowerCase().match(/\.(ppt|pptx)$/);
-                if (isPdf) {
-                    onContentChange(`<iframe src="${uploadedFile.url}" width="100%" height="600" title="${file.name}" style="border: none;"></iframe>`);
-                } else if (isOffice) {
-                    const encodedUrl = encodeURIComponent(uploadedFile.url);
-                    onContentChange(`<iframe src="https://view.officeapps.live.com/op/embed.aspx?src=${encodedUrl}" width="100%" height="600" title="${file.name}" frameborder="0"></iframe>`);
-                } else {
-                    onContentChange(`<div class="artifact-file-card"><div class="artifact-file-icon">📄</div><div class="artifact-file-info"><div class="artifact-file-name">${file.name}</div><div class="artifact-file-type">Presentation</div></div><a href="${uploadedFile.url}" target="_blank" rel="noopener noreferrer" class="artifact-file-button">Open File ↗</a></div>`);
-                }
-            }
-        } catch (error) {
-            console.error('Failed to upload slideshow:', error);
-        } finally {
-            setUploading(false);
         }
-    }, [exhibitId, onContentChange]);
+    }, [exhibitId, syncContent]);
 
-    const handleDrop = useCallback((e: React.DragEvent) => {
+    const removeSlide = useCallback((index: number) => {
+        setSlides(prev => {
+            const next = prev.filter((_, i) => i !== index);
+            syncContent(next);
+            return next;
+        });
+    }, [syncContent]);
+
+    const moveSlide = useCallback((from: number, to: number) => {
+        if (from === to) return;
+        setSlides(prev => {
+            const next = [...prev];
+            const [moved] = next.splice(from, 1);
+            next.splice(to, 0, moved);
+            syncContent(next);
+            return next;
+        });
+    }, [syncContent]);
+
+    // --- File drop (for adding new images) ---
+    const handleFileDrop = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
-        if (e.dataTransfer.files?.length) handleFileUpload(e.dataTransfer.files);
-    }, [handleFileUpload]);
+        if (dragIdx !== null) return;
+        if (e.dataTransfer.files?.length) handleFiles(e.dataTransfer.files);
+    }, [handleFiles, dragIdx]);
 
-    const handleDrag = useCallback((e: React.DragEvent) => {
+    const handleFileDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
         if (e.type === 'dragenter' || e.type === 'dragover') setDragActive(true);
         else if (e.type === 'dragleave') setDragActive(false);
     }, []);
 
-    const removeFile = useCallback((index: number) => {
-        setUploadedFiles(prev => {
-            const next = prev.filter((_, i) => i !== index);
-            if (next.length === 0) onContentChange('');
-            return next;
-        });
-    }, [onContentChange]);
+    // --- Reorder drag (vertical-only with drop indicator) ---
+    const handleSlideDragStart = useCallback((e: React.DragEvent, idx: number) => {
+        setDragIdx(idx);
+        setDropTargetIdx(null);
+        e.dataTransfer.setDragImage(TRANSPARENT_IMG, 0, 0);
+        e.dataTransfer.effectAllowed = 'move';
+    }, []);
 
-    // Sync content when URL changes
-    const handleUrlChange = useCallback((url: string) => {
-        setSlideshowUrl(url);
-        const id = extractGoogleSlidesId(url);
-        if (id) onContentChange(generateGoogleSlidesEmbed(id));
-    }, [onContentChange]);
+    const handleSlideDragOver = useCallback((e: React.DragEvent, idx: number) => {
+        e.preventDefault();
+        if (dragIdx === null) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        const target = e.clientY < midY ? idx : idx + 1;
+        if (target === dragIdx || target === dragIdx + 1) {
+            setDropTargetIdx(null);
+        } else {
+            setDropTargetIdx(target);
+        }
+    }, [dragIdx]);
+
+    const handleListDragOver = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+    }, []);
+
+    const handleSlideDrop = useCallback(() => {
+        if (dragIdx !== null && dropTargetIdx !== null) {
+            const adjustedTarget = dropTargetIdx > dragIdx ? dropTargetIdx - 1 : dropTargetIdx;
+            moveSlide(dragIdx, adjustedTarget);
+        }
+        setDragIdx(null);
+        setDropTargetIdx(null);
+    }, [dragIdx, dropTargetIdx, moveSlide]);
+
+    const handleSlideDragEnd = useCallback(() => {
+        setDragIdx(null);
+        setDropTargetIdx(null);
+    }, []);
+
+    const uploading = slides.some(s => s.uploading);
 
     return (
         <Form.Group className="mb-3">
-            <Form.Label>Slideshow Source *</Form.Label>
-            <div className="d-flex gap-2 mb-2">
-                <Button variant={inputMode === 'url' ? 'primary' : 'outline-secondary'} size="sm"
-                    onClick={() => { setInputMode('url'); setUploadedFiles([]); onContentChange(''); }}>
-                    Google Slides URL
-                </Button>
-                <Button variant={inputMode === 'upload' ? 'primary' : 'outline-secondary'} size="sm"
-                    onClick={() => { setInputMode('upload'); setSlideshowUrl(''); onContentChange(''); }}>
-                    Upload File
-                </Button>
-            </div>
+            <Form.Label>Slide Images *</Form.Label>
 
-            {inputMode === 'url' ? (
-                <>
-                    <Form.Control type="url" value={slideshowUrl} onChange={(e) => handleUrlChange(e.target.value)}
-                        placeholder="https://docs.google.com/presentation/d/..." required={!content} />
-                    <Form.Text className="text-muted">Paste a Google Slides presentation URL</Form.Text>
-                </>
-            ) : (
-                <>
-                    <div className={`file-drop-zone p-4 text-center border rounded ${dragActive ? 'border-primary bg-primary bg-opacity-10' : 'border-dashed'}`}
-                        onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
-                        onClick={() => fileInputRef.current?.click()}
-                        style={{ cursor: 'pointer', borderStyle: dragActive ? 'solid' : 'dashed' }}>
-                        {uploading ? (
-                            <div className="d-flex align-items-center justify-content-center gap-2">
-                                <Spinner size="sm" /><span>Uploading...</span>
-                            </div>
-                        ) : (
-                            <>
-                                <CloudUpload size={40} className="text-muted mb-2" />
-                                <p className="mb-1">Drag and drop files here, or click to browse</p>
-                                <small className="text-muted">PDF or PowerPoint files</small>
-                            </>
-                        )}
-                    </div>
-                    <input ref={fileInputRef} type="file" accept=".pdf,.ppt,.pptx"
-                        onChange={(e) => e.target.files?.length && handleFileUpload(e.target.files)} style={{ display: 'none' }} />
-                    {uploadedFiles.length > 0 && (
-                        <div className="mt-3">
-                            <small className="text-muted d-block mb-2">Uploaded files:</small>
-                            <div className="d-flex flex-wrap gap-2">
-                                {uploadedFiles.map((file, index) => (
-                                    <div key={index} className="d-flex align-items-center gap-2 p-2 rounded" style={{ fontSize: '0.875rem' }}>
-                                        <FileEarmark size={24} className="text-muted" />
-                                        <span className="text-truncate" style={{ maxWidth: 120 }}>{file.name}</span>
-                                        <Button variant="link" size="sm" className="p-0 text-danger" onClick={(e) => { e.stopPropagation(); removeFile(index); }}>
-                                            <Trash size={18} />
-                                        </Button>
+            {slides.length > 0 && (
+                <div
+                    className="slideshow-editor-list mb-3"
+                    onDragOver={handleListDragOver}
+                    onDrop={handleSlideDrop}
+                >
+                    {slides.map((slide, idx) => (
+                        <div key={slide.url}>
+                            {dropTargetIdx === idx && (
+                                <div className="slideshow-editor-drop-indicator" />
+                            )}
+                            <div
+                                className={`slideshow-editor-item${dragIdx === idx ? ' dragging' : ''}`}
+                                draggable
+                                onDragStart={(e) => handleSlideDragStart(e, idx)}
+                                onDragOver={(e) => handleSlideDragOver(e, idx)}
+                                onDragEnd={handleSlideDragEnd}
+                            >
+                                <GripVertical size={16} className="slideshow-editor-grip" />
+                                <span className="slideshow-editor-number">{idx + 1}</span>
+                                <img
+                                    src={slide.url}
+                                    alt={`Slide ${idx + 1}`}
+                                    className="slideshow-editor-thumb"
+                                />
+                                {slide.uploading && (
+                                    <div className="slideshow-editor-uploading">
+                                        <Spinner size="sm" />
                                     </div>
-                                ))}
+                                )}
+                                <Button
+                                    variant="link"
+                                    size="sm"
+                                    className="p-0 text-danger slideshow-editor-delete"
+                                    onClick={() => removeSlide(idx)}
+                                    disabled={slide.uploading}
+                                >
+                                    <Trash size={16} />
+                                </Button>
                             </div>
                         </div>
+                    ))}
+                    {dropTargetIdx === slides.length && (
+                        <div className="slideshow-editor-drop-indicator" />
                     )}
-                </>
+                </div>
             )}
+
+            <div
+                className={`file-drop-zone p-4 text-center border rounded${dragActive ? ' border-primary bg-primary bg-opacity-10' : ''}`}
+                onDragEnter={handleFileDrag}
+                onDragLeave={handleFileDrag}
+                onDragOver={handleFileDrag}
+                onDrop={handleFileDrop}
+                onClick={() => fileInputRef.current?.click()}
+                style={{ cursor: 'pointer', borderStyle: dragActive ? 'solid' : 'dashed' }}
+            >
+                {uploading ? (
+                    <div className="d-flex align-items-center justify-content-center gap-2">
+                        <Spinner size="sm" /><span>Uploading...</span>
+                    </div>
+                ) : (
+                    <>
+                        <CloudUpload size={40} className="text-muted mb-2" />
+                        <p className="mb-1">
+                            {slides.length > 0 ? 'Add more slides' : 'Drag and drop images here, or click to browse'}
+                        </p>
+                        <small className="text-muted">PNG, JPG, GIF, or WebP — select multiple to add in order</small>
+                    </>
+                )}
+            </div>
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => e.target.files?.length && handleFiles(e.target.files)}
+                style={{ display: 'none' }}
+            />
         </Form.Group>
     );
 }
 
+// ---------------------------------------------------------------------------
+// Slide Viewer (used inside the modal)
+// ---------------------------------------------------------------------------
+
+function SlideViewer({ slides }: { slides: string[] }) {
+    const [current, setCurrent] = useState(0);
+    const touchStartX = useRef(0);
+    const total = slides.length;
+
+    const prev = useCallback(() => setCurrent(i => Math.max(0, i - 1)), []);
+    const next = useCallback(() => setCurrent(i => Math.min(total - 1, i + 1)), [total]);
+
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'ArrowLeft') prev();
+            else if (e.key === 'ArrowRight') next();
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [prev, next]);
+
+    const onTouchStart = useCallback((e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX;
+    }, []);
+
+    const onTouchEnd = useCallback((e: React.TouchEvent) => {
+        const dx = e.changedTouches[0].clientX - touchStartX.current;
+        if (Math.abs(dx) > 50) {
+            if (dx < 0) next();
+            else prev();
+        }
+    }, [prev, next]);
+
+    return (
+        <div
+            className="slide-viewer"
+            onClick={e => e.stopPropagation()}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+        >
+            {current > 0 && (
+                <button className="slide-viewer-arrow slide-viewer-arrow-left" onClick={prev} aria-label="Previous slide">
+                    <ArrowLeft size={24} />
+                </button>
+            )}
+            <img
+                src={slides[current]}
+                alt={`Slide ${current + 1} of ${total}`}
+                className="slide-viewer-image"
+                draggable={false}
+            />
+            {current < total - 1 && (
+                <button className="slide-viewer-arrow slide-viewer-arrow-right" onClick={next} aria-label="Next slide">
+                    <ArrowRight size={24} />
+                </button>
+            )}
+            <div className="slide-viewer-counter">
+                {current + 1} / {total}
+            </div>
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Display Component
+// ---------------------------------------------------------------------------
+
 export default function ArtifactSlideshow({ artifact }: ArtifactProps) {
     const [modalOpen, setModalOpen] = useState(false);
-    const thumbnailUrl = getThumbnailUrl(artifact);
+    const slides = parseSlidesContent(artifact.content);
+    const isLegacy = slides === null;
+    const firstSlide = slides?.[0] ?? null;
+
     const preview = artifact.description.length > 100
         ? artifact.description.substring(0, 100) + '...'
         : artifact.description;
 
     return (
         <>
-        <div className="artifact-card artifact-slideshow" onClick={() => setModalOpen(true)}>
-            <div className="artifact-shadow" />
-            <div className="artifact-content">
-                <div className="artifact-preview artifact-slideshow-preview">
-                    {thumbnailUrl ? (
-                        <img src={thumbnailUrl} alt={artifact.title} className="artifact-image" />
-                    ) : (
-                        <div className="artifact-slideshow-placeholder">
-                            <FileEarmarkText size={48} className="text-muted" />
+            <div className="artifact-card artifact-slideshow" onClick={() => setModalOpen(true)}>
+                <div className="artifact-shadow" />
+                <div className="artifact-content">
+                    <div className="artifact-preview artifact-slideshow-preview">
+                        {firstSlide ? (
+                            <img src={firstSlide} alt={artifact.title} className="artifact-image" />
+                        ) : artifact.thumbnailUrl ? (
+                            <img src={artifact.thumbnailUrl} alt={artifact.title} className="artifact-image" />
+                        ) : (
+                            <div className="artifact-slideshow-placeholder">
+                                <Images size={48} className="text-muted" />
+                            </div>
+                        )}
+                        <div className="artifact-badge-container">
+                            <span className="artifact-badge">
+                                {slides ? `${slides.length} Slide${slides.length !== 1 ? 's' : ''}` : 'Slideshow'}
+                            </span>
                         </div>
-                    )}
-                    <div className="artifact-badge-container">
-                        <span className="artifact-badge">Slideshow</span>
                     </div>
-                </div>
-                <div className="artifact-meta">
-                    <div className="artifact-header">
-                        <span className="artifact-title">{artifact.title}</span>
+                    <div className="artifact-meta">
+                        <div className="artifact-header">
+                            <span className="artifact-title">{artifact.title}</span>
+                        </div>
+                        <p className="artifact-text">{preview || 'View presentation...'}</p>
+                        <div className="artifact-cta">Click to Open Archive</div>
                     </div>
-                    <p className="artifact-text">{preview || 'View presentation...'}</p>
-                    <div className="artifact-cta">Click to Open Archive</div>
                 </div>
             </div>
-        </div>
 
-        <ArtifactModal
-            show={modalOpen}
-            onClose={() => setModalOpen(false)}
-            title={artifact.title}
-            description={artifact.description}
-        >
-            <div
-                className="artifact-modal-slideshow"
-                dangerouslySetInnerHTML={{ __html: artifact.content }}
-            />
-        </ArtifactModal>
+            <ArtifactModal
+                show={modalOpen}
+                onClose={() => setModalOpen(false)}
+                variant={isLegacy ? 'default' : 'video'}
+                title={isLegacy ? artifact.title : undefined}
+                description={isLegacy ? artifact.description : undefined}
+            >
+                {isLegacy ? (
+                    <div
+                        className="artifact-modal-slideshow"
+                        dangerouslySetInnerHTML={{ __html: artifact.content }}
+                    />
+                ) : slides && slides.length > 0 ? (
+                    <SlideViewer slides={slides} />
+                ) : (
+                    <p className="text-muted text-center py-4">No slides to display.</p>
+                )}
+            </ArtifactModal>
         </>
     );
 }

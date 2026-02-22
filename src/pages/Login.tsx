@@ -125,7 +125,7 @@ function Login() {
                     <Card.Text>Please sign in to access the ACP Tribute Board</Card.Text>
                     <div className="d-grid mb-3">
                         <Button
-                            variant="outline-dark"
+                            variant="outline-secondary"
                             onClick={handleGoogleSignIn}
                             disabled={loading}
                             className="d-flex align-items-center justify-content-center gap-2"

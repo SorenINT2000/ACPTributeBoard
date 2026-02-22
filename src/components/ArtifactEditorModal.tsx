@@ -18,7 +18,7 @@ interface ArtifactEditorModalProps {
 
 const ARTIFACT_TYPES: Array<{ value: Artifact['type']; label: string; description: string }> = [
     { value: 'video', label: 'Video', description: 'YouTube or Vimeo video' },
-    { value: 'slideshow', label: 'Slideshow', description: 'Google Slides URL or upload PDF' },
+    { value: 'slideshow', label: 'Slideshow', description: 'Upload slide images' },
     { value: 'document', label: 'Document', description: 'Upload PDF or other documents' },
     { value: 'gallery', label: 'Gallery', description: 'Collection of images' },
 ];
@@ -280,7 +280,6 @@ function ArtifactEditorModal({ show, exhibitId, artifact, onClose, onSaved }: Ar
                             exhibitId={exhibitId}
                             content={content}
                             onContentChange={setContent}
-                            initialContent={artifact?.type === 'slideshow' ? artifact.content : undefined}
                         />
                     )}
 
