@@ -56,7 +56,7 @@ function Navbar() {
             expand="lg"
             expanded={expanded}
             onToggle={setExpanded}
-            className={`border-bottom navbar-sticky${hidden ? ' navbar-hidden' : ''}`}
+            className={`border-bottom navbar-sticky${hidden && !expanded ? ' navbar-hidden' : ''}`}
         >
             <Container>
                 <BootstrapNavbar.Toggle aria-controls="main-navbar-nav" className="order-0" />

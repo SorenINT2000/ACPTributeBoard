@@ -90,11 +90,20 @@ a:hover {
     transform: translateY(-100%);
 }
 
+.navbar-sticky .navbar-toggler {
+    border: none;
+    box-shadow: none;
+}
+
+.navbar-sticky .navbar-toggler:focus {
+    box-shadow: none;
+}
+
 /* Mobile drawer refinements */
 @media (max-width: 991.98px) {
-    .navbar-sticky .navbar-collapse {
+    .navbar-sticky .navbar-collapse & .show {
         padding-top: 0.5rem;
-        padding-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
     }
 
     .navbar-sticky .navbar-collapse .nav-link {
