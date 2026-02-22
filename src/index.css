@@ -90,6 +90,30 @@ a:hover {
     transform: translateY(-100%);
 }
 
+/* Mobile drawer refinements */
+@media (max-width: 991.98px) {
+    .navbar-sticky .navbar-collapse {
+        padding-top: 0.5rem;
+        padding-bottom: 0.75rem;
+    }
+
+    .navbar-sticky .navbar-collapse .nav-link {
+        padding: 0.625rem 0.75rem;
+        border-radius: 6px;
+        transition: background-color 0.15s ease;
+    }
+
+    .navbar-sticky .navbar-collapse .nav-link:hover,
+    .navbar-sticky .navbar-collapse .nav-link:focus {
+        background-color: var(--color-bg-tertiary);
+    }
+
+    .navbar-user-info {
+        font-size: 0.875rem;
+        color: var(--color-text-muted);
+    }
+}
+
 /* Navigation Styles */
 nav ul {
     list-style: none;

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Navbar as BootstrapNavbar, Nav, Container, NavbarText, Button } from 'react-bootstrap';
-import { SunFill, MoonStarsFill, CircleHalf } from 'react-bootstrap-icons';
+import { Navbar as BootstrapNavbar, Nav, Container, Button } from 'react-bootstrap';
+import { SunFill, MoonStarsFill, CircleHalf, BoxArrowRight, PersonCircle } from 'react-bootstrap-icons';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme, type ThemePreference } from '../contexts/ThemeContext';
 import { signOut } from 'firebase/auth';
@@ -18,7 +18,10 @@ function Navbar() {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
     const [hidden, setHidden] = useState(false);
+    const [expanded, setExpanded] = useState(false);
     const lastScrollY = useRef(0);
+
+    const closeDrawer = useCallback(() => setExpanded(false), []);
 
     const handleScroll = useCallback(() => {
         const y = window.scrollY;
@@ -49,47 +52,53 @@ function Navbar() {
     };
 
     return (
-        <BootstrapNavbar expand="lg" className={`border-bottom navbar-sticky${hidden ? ' navbar-hidden' : ''}`}>
+        <BootstrapNavbar
+            expand="lg"
+            expanded={expanded}
+            onToggle={setExpanded}
+            className={`border-bottom navbar-sticky${hidden ? ' navbar-hidden' : ''}`}
+        >
             <Container>
-                <BootstrapNavbar.Toggle aria-controls="basic-navbar-nav" className="order-0" />
+                <BootstrapNavbar.Toggle aria-controls="main-navbar-nav" className="order-0" />
                 <BootstrapNavbar.Brand as={Link} to="/" className="order-1">
                     ACP Tribute Board
                 </BootstrapNavbar.Brand>
-                <BootstrapNavbar.Collapse id="basic-navbar-nav" className="order-2">
+
+                {/* Always-visible controls beside the brand (mobile + desktop) */}
+                <div className="d-flex align-items-center gap-2 order-2 order-lg-3 ms-auto ms-lg-0">
+                    <Button
+                        variant="link"
+                        className="nav-link d-flex align-items-center gap-1 px-2"
+                        onClick={cycleTheme}
+                        title={`Theme: ${THEME_LABEL[theme]}`}
+                        aria-label={`Switch theme (current: ${THEME_LABEL[theme]})`}
+                    >
+                        <ThemeIcon size={16} />
+                        <span className="d-none d-lg-inline" style={{ fontSize: '0.8rem' }}>{THEME_LABEL[theme]}</span>
+                    </Button>
+                </div>
+
+                <BootstrapNavbar.Collapse id="main-navbar-nav" className="order-3 order-lg-2">
                     <Nav className="me-auto">
-                        <Nav.Link as={Link} to="/">
-                            Home
-                        </Nav.Link>
+                        <Nav.Link as={Link} to="/" onClick={closeDrawer}>Home</Nav.Link>
                         {currentUser && (
                             <>
-                                <Nav.Link as={Link} to="/feed">
-                                    Feed
-                                </Nav.Link>
-                                <Nav.Link as={Link} to="/exhibit">
-                                    Exhibit
-                                </Nav.Link>
+                                <Nav.Link as={Link} to="/feed" onClick={closeDrawer}>Feed</Nav.Link>
+                                <Nav.Link as={Link} to="/exhibit" onClick={closeDrawer}>Exhibit</Nav.Link>
                                 {isHighLevel && (
-                                    <Nav.Link as={Link} to="/admin">
-                                        Admin
-                                    </Nav.Link>
+                                    <Nav.Link as={Link} to="/admin" onClick={closeDrawer}>Admin</Nav.Link>
                                 )}
                             </>
                         )}
                     </Nav>
-                    <Nav className="align-items-center">
-                        <Button
-                            variant="link"
-                            className="nav-link d-flex align-items-center gap-1 px-2"
-                            onClick={cycleTheme}
-                            title={`Theme: ${THEME_LABEL[theme]}`}
-                            aria-label={`Switch theme (current: ${THEME_LABEL[theme]})`}
-                        >
-                            <ThemeIcon size={16} />
-                            <span className="d-none d-lg-inline" style={{ fontSize: '0.8rem' }}>{THEME_LABEL[theme]}</span>
-                        </Button>
+
+                    <hr className="d-lg-none my-2 border-top" />
+
+                    <Nav className="align-items-lg-center navbar-user-section">
                         {currentUser ? (
                             <>
-                                <NavbarText className="me-3 d-flex align-items-center gap-2">
+                                <div className="d-flex align-items-center gap-2 px-3 py-2 px-lg-0 py-lg-0 me-lg-3 navbar-user-info">
+                                    <PersonCircle size={18} className="text-muted d-lg-none" />
                                     {isHighLevel && (
                                         <span
                                             className="badge rounded-pill"
@@ -99,16 +108,20 @@ function Navbar() {
                                             Staff
                                         </span>
                                     )}
-                                    {currentUser.email}
-                                </NavbarText>
-                                <Nav.Link onClick={handleSignOut}>
+                                    <span className="text-truncate" style={{ maxWidth: '200px' }}>
+                                        {currentUser.email}
+                                    </span>
+                                </div>
+                                <Nav.Link
+                                    onClick={() => { closeDrawer(); handleSignOut(); }}
+                                    className="d-flex align-items-center gap-2"
+                                >
+                                    <BoxArrowRight size={16} className="d-lg-none" />
                                     Sign Out
                                 </Nav.Link>
                             </>
                         ) : (
-                            <Nav.Link as={Link} to="/login">
-                                Log In
-                            </Nav.Link>
+                            <Nav.Link as={Link} to="/login" onClick={closeDrawer}>Log In</Nav.Link>
                         )}
                     </Nav>
                 </BootstrapNavbar.Collapse>
