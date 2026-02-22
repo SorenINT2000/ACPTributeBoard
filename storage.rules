@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Post images - authenticated users can upload, anyone can read
+    match /post-images/{postId}/{imageId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if request.auth != null
+        && request.auth.token.highLevel == true;
+    }
+    
+    // Artifact files - authenticated users can upload, high-level can delete
+    match /artifacts/{exhibitFolder}/{fileId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.resource.size < 50 * 1024 * 1024;
+      allow delete: if request.auth != null
+        && request.auth.token.highLevel == true;
+    }
+    
+    // Default: deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

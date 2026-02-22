@@ -1,0 +1,7717 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "2.6.0",
+    "title": "Main Modules",
+    "description": "The official swagger document for the ACP API"
+  },
+  "host": "webapi.acponline.org",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/api/addresses": {
+      "post": {
+        "tags": [
+          "Address"
+        ],
+        "summary": "adds an address to an existing customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>WriteCustomerData<b/>",
+        "operationId": "Address_AddAddressForCustomer",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CustomerAddress"
+            }
+          },
+          {
+            "name": "primary",
+            "in": "query",
+            "description": "set to true to make this the primary address",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "validate",
+            "in": "query",
+            "description": "set to true to validate the address",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/CustomerAddressContext"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/alias/{masterCustomerId}": {
+      "get": {
+        "tags": [
+          "Alias"
+        ],
+        "summary": "Get all aliases for a specific customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Alias_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subCustomerId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Alias"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Alias"
+        ],
+        "summary": "add a new alias for the customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Alias_Post",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "alias",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Alias"
+            }
+          },
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Alias"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/applications/{clientId}": {
+      "get": {
+        "tags": [
+          "Application"
+        ],
+        "summary": "Returns the requested application",
+        "operationId": "Application_GetApplication",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ApplicationModel"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/applications/{clientId}/scopes": {
+      "get": {
+        "tags": [
+          "Application"
+        ],
+        "summary": "Returns the approved scopes for the given application",
+        "operationId": "Application_GetScopesForApplication",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "Acp",
+                  "Authentication",
+                  "MemberStatus",
+                  "ReadCustomerData",
+                  "WriteCustomerData"
+                ],
+                "type": "string"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/awards": {
+      "get": {
+        "tags": [
+          "Awards"
+        ],
+        "summary": "Get all awards for a given filter",
+        "operationId": "Awards_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "beginYear",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "endYear",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "chapters",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "awardId",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AcpAward"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/awards/{id}": {
+      "get": {
+        "tags": [
+          "Awards"
+        ],
+        "summary": "Get a specific award by its id",
+        "operationId": "Awards_GetById",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AcpAward"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/awards/programs": {
+      "get": {
+        "tags": [
+          "Awards"
+        ],
+        "summary": "Get the programs that awards are tied to",
+        "operationId": "Awards_GetPrograms",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AcpAwardProgram"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/countries": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Retrieves all active countries (USA first)",
+        "operationId": "Codes_GetCountries",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "continent",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LookupItem"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/countries/{countryCode}": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get country for a specific continent and country code",
+        "operationId": "Codes_GetCountry",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "countryCode",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Country"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/states": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Retrieves all active states",
+        "operationId": "Codes_GetStates",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/State"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/states/{stateCode}": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get State for a specific continent and country code",
+        "operationId": "Codes_GetState",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "countryCode",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stateCode",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/State"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/customerclasses": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Retrieves all active customer classes",
+        "operationId": "Codes_GetCustomerClasses",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LookupItem"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/medicalschools": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Retrieves all active medical schools optionally based on country, state, and city codes",
+        "operationId": "Codes_GetMedicalSchoolList",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "countryCode",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "stateCode",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MedicalSchool"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/medicalschools/{prefix}": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Retrieves all active medical schools based on the specified prefix",
+        "operationId": "Codes_GetMedicalSchools",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "prefix",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MedicalSchool"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/medicalbackgrounds": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get medical backgrounds",
+        "operationId": "Codes_GetMedicalBackgrounds",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/LookupItem"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/regions": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Retrieves all active regions",
+        "operationId": "Codes_GetRegions",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LookupItem"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/specialties": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Retrieves all active specialties",
+        "operationId": "Codes_GetSpecialties",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LookupItem"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/{subsystem}/{type}": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get codes for a specific subsystem and type",
+        "operationId": "Codes_GetCodesByType",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "subsystem",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PersonifyCode"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/{subsystem}/{type}/{code}": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get code for a specific subsystem, type and code",
+        "operationId": "Codes_GetCode",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "subsystem",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "code",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/PersonifyCode"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/{subsystem}/{type}/{code}/subcodes": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get sub codes for a specific subsystem, type, and code",
+        "operationId": "Codes_GetSubCodesByType",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "subsystem",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "code",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "activeOnly",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PersonifySubCode"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/codes/{subsystem}/{type}/{code}/{subcode}": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get sub code for a specific subsystem, type, code and subcode",
+        "operationId": "Codes_GetSubCode",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "subsystem",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "code",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subcode",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/PersonifySubCode"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/changes": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Get all customers with changes in a given range",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/>",
+        "operationId": "Customer_GetCustomerChanges",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "start_index",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/PagedResults[String]"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Retrieves the customer for the given master customer id",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_GetCustomer",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Customer"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/status": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Check on the current status of the user",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/><br/><b>MemberStatus<b/>",
+        "operationId": "Customer_GetCustomerStatus",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MemberStatus"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/membership": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Get the membership info for this customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/><br/><b>MemberStatus<b/>",
+        "operationId": "Customer_GetCustomerMembershipInfo",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subCustomerId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Membership"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/showmodal": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Check if we should show a welcome message for the user or not",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_ShouldShowWelcomeModal",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/NewMemberContext"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/census": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "gets the census data for this customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_Census",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/CensusData"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/titles": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "get all titles for this customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_Titles",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subCustomerId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Title"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/orders": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "gets all orders placed by the customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_GetOrdersForCustomer",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subCustomerId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "includeCancelled",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Order"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/residencies": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Retrieves all residencies for the provided Customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_GetResidenciesForCustomer",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Residency"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/boards": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Retrieves all board certifications for the provided Customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_GetBoardsForCustomer",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Board"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "add a board to this customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>WriteCustomerData<b/>",
+        "operationId": "Customer_AddBoardToCustomer",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "board",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Board"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Board"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/relationships": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Gets all [one-way] relationships for a given customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_GetRelationships",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subCustomerId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "includeExpired",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CustomerRelationship"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/demographics": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Retrieves all demographics for a given Customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_GetDemographicsForCustomer",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "demographicCode",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Demographic"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/activities/{activityCode}": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Retrieves all activities for a Customer with the given activity code",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_GetActivitiesForCustomer",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "activityCode",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Activity"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/communications": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Get all active forms of communication for the given customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_GetCommunicationsForCustomer",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subCustomerId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CustomerCommunication"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/addresses": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_GetAddressesForCustomer",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subCustomerId",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CustomerAddress"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/{masterCustomerId}/intmilestone": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Get the international milestone for the customer",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_GetIntMilestoneType",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "subCustomerId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ValueObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/customers/search": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Search for customers based on first and last name",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Customer_SearchCustomer",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "lastName",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "firstName",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Customer"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/demographics/{id}": {
+      "get": {
+        "tags": [
+          "Demographics"
+        ],
+        "summary": "get a demographic",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Demographics_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Demographic"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Demographics"
+        ],
+        "summary": "update an existing demographic",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Demographics_Update",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "demographic",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Demographic"
+            }
+          },
+          {
+            "name": "modoper",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Demographic"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Demographics"
+        ],
+        "summary": "delete a demographic",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/>",
+        "operationId": "Demographics_Delete",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Demographic"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/demographics": {
+      "post": {
+        "tags": [
+          "Demographics"
+        ],
+        "summary": "add a new demographic",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Demographics_Add",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "demographic",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Demographic"
+            }
+          },
+          {
+            "name": "addoper",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Demographic"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/mbrproductpostal": {
+      "get": {
+        "tags": [
+          "MbrProductPostal"
+        ],
+        "summary": "Get the chapter and region for a given location",
+        "operationId": "MbrProductPostal_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "countryCode",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "zip",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MbrProductPostalLink"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/messages": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Get all messages that are currently active for the college",
+        "operationId": "Messages_GetActiveAcpMessages",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AcpMessage"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Add or Update an Acp Message to be displayed across all supporting applications",
+        "operationId": "Messages_SaveAcpMessage",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "acpMessage",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AcpMessage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AcpMessage"
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/{id}": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "get a specific message",
+        "operationId": "Messages_GetAcpMessage",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AcpMessage"
+            }
+          }
+        }
+      }
+    },
+    "/token": {
+      "post": {
+        "tags": [
+          "Oauth"
+        ],
+        "summary": "Attempts to generate a token based on the supplied grant type and parameters",
+        "operationId": "Oauth_Token",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "OAuthTokenModel",
+            "in": "body",
+            "description": "credentials to be validated",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OAuthTokenModel"
+            },
+            "type": "AcpWebApi.Interfaces.Models.OAuthTokenModel"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Session"
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": [
+          "Oauth"
+        ],
+        "summary": "Returns the user identified by the supplied access token",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>Authentication<b/>",
+        "operationId": "Oauth_GetUser",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/UserModel"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/token_info": {
+      "post": {
+        "tags": [
+          "Oauth"
+        ],
+        "summary": "Validate the token based on RFC 7662",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>Authentication<b/>",
+        "operationId": "Oauth_ValidateToken",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "introspectionRequest",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/IntrospectionRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/IntrospectionResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/orderqueue": {
+      "get": {
+        "tags": [
+          "OrderQueue"
+        ],
+        "summary": "Get all the orders that are pending generation",
+        "operationId": "OrderQueue_GetPendingRequests",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "maxRetries",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "delayMinutes",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AcpOrderRequest"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "OrderQueue"
+        ],
+        "summary": "Update an item in the queue",
+        "operationId": "OrderQueue_UpdateOrderAsync",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "acpOrderRequest",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AcpOrderRequest"
+            }
+          },
+          {
+            "name": "modOper",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AcpOrderRequest"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/products": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "returns all active products",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/>",
+        "operationId": "Products_GetProducts",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "productCode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "masterCustomerId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Product"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/products/{id}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "returns the specified product",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/>",
+        "operationId": "Products_GetProduct",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/products/upgrade": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "returns the upgrade product id, if one is available",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/>",
+        "operationId": "Products_GetUpgradeProduct",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "masterCustomerId",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/UpgradeProduct"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/products/PreviewMembershipOrder": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Returns a preview of a membership order for a given customer, including pricing after proration and active dates.",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/>",
+        "operationId": "Products_PreviewMembershipOrder",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "input",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/GetMembershipOrderPreviewInput"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GetMembershipOrderPreviewOutput"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/products/{id}/Benefits": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/>",
+        "operationId": "Products_GetProductBenefits",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "rateStructure",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "rateCode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ProductBenefit"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/programs": {
+      "get": {
+        "tags": [
+          "Programs"
+        ],
+        "summary": "Get residency info based on a number of optional filters",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/>",
+        "operationId": "Programs_GetPrograms",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "country",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "alias",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "searchName",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "mcid",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "scid",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AcpProgram"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/programs/{mcid}": {
+      "get": {
+        "tags": [
+          "Programs"
+        ],
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/>",
+        "operationId": "Programs_GetProgram",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "country",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "mcid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AcpProgram"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/proxy/items": {
+      "get": {
+        "tags": [
+          "Proxy"
+        ],
+        "summary": "Returns all items for the proxy",
+        "operationId": "Proxy_Items",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ProxyItem"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/proxy/items/{id}": {
+      "get": {
+        "tags": [
+          "Proxy"
+        ],
+        "summary": "Returns a single item for the proxy",
+        "operationId": "Proxy_Item",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ProxyItem"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/relationships": {
+      "get": {
+        "tags": [
+          "Relationships"
+        ],
+        "summary": "Get all relationships for a given filter",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Relationships_GetMany",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "relationshipType",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "relationshipCode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "reciprocalCode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CustomerRelationship"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/relationships/{id}": {
+      "get": {
+        "tags": [
+          "Relationships"
+        ],
+        "summary": "Get a relationship by its id",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>ReadCustomerData<b/>",
+        "operationId": "Relationships_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/CustomerRelationship"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/session/{token}": {
+      "get": {
+        "tags": [
+          "Session"
+        ],
+        "summary": "Get information for the specified token",
+        "operationId": "Session_GetSessionByToken",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "description": "the token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Session"
+            }
+          }
+        }
+      }
+    },
+    "/api/session/{token}/active": {
+      "get": {
+        "tags": [
+          "Session"
+        ],
+        "summary": "Determines if the specified token is still valid",
+        "operationId": "Session_SessionIsActive",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "description": "the token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "/api/session/{token}/scopes": {
+      "get": {
+        "tags": [
+          "Session"
+        ],
+        "summary": "get the scopes associated with a specific token",
+        "operationId": "Session_GetScopesForToken",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "Acp",
+                  "Authentication",
+                  "MemberStatus",
+                  "ReadCustomerData",
+                  "WriteCustomerData"
+                ],
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/session/logout": {
+      "post": {
+        "tags": [
+          "Session"
+        ],
+        "summary": "Logout of the current session. Auto login processes may log you back in if you don't delete the legacy cookie",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>Authentication<b/>",
+        "operationId": "Session_Logout",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Session"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/session/register": {
+      "post": {
+        "tags": [
+          "Session"
+        ],
+        "summary": "Attempts to register and generate a token with the specified information",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>Authentication<b/>",
+        "operationId": "Session_Register",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "registerModel",
+            "in": "body",
+            "description": "object representing the user information",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegisterSessionModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Session"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/session/updatepassword": {
+      "post": {
+        "tags": [
+          "Session"
+        ],
+        "summary": "Attempts to update the existing password with the new one",
+        "description": "In order to access this resource, your application must include one of the following scopes:<br/><b>Acp<b/><br/><b>WriteCustomerData<b/>",
+        "operationId": "Session_UpdatePassword",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml",
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "parameters": [
+          {
+            "name": "update",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdatePasswordModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/UserModel"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/api/utilities/isalive": {
+      "get": {
+        "tags": [
+          "Utilities"
+        ],
+        "summary": "Simple test endpoint to verify connectivity",
+        "operationId": "Utilities_IsAlive",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json",
+          "multipart/form-data",
+          "application/xml",
+          "text/xml"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "CustomerAddress": {
+      "type": "object",
+      "properties": {
+        "cus_address_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "address1": {
+          "type": "string"
+        },
+        "address2": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "country_descr": {
+          "type": "string"
+        },
+        "formatted_address": {
+          "type": "string"
+        },
+        "address_status_code": {
+          "type": "string"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CustomerAddressDetail"
+          }
+        }
+      }
+    },
+    "CustomerAddressDetail": {
+      "type": "object",
+      "properties": {
+        "cus_address_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "address_type_code": {
+          "type": "string"
+        },
+        "priority_sequence": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "label_name": {
+          "type": "string"
+        },
+        "company_name": {
+          "type": "string"
+        },
+        "personal_line": {
+          "type": "string"
+        },
+        "ship_to": {
+          "type": "boolean"
+        },
+        "bill_to": {
+          "type": "boolean"
+        },
+        "directory": {
+          "type": "boolean"
+        },
+        "confidential": {
+          "type": "boolean"
+        },
+        "address_status_code": {
+          "type": "string"
+        },
+        "seasonal_start_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "seasonal_end_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "CustomerAddressContext": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/CustomerAddress"
+        },
+        "success": {
+          "type": "boolean"
+        },
+        "status_message": {
+          "type": "string"
+        }
+      }
+    },
+    "Alias": {
+      "required": [
+        "master_customer_id",
+        "alias_code",
+        "search_name"
+      ],
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "cus_alias_seq": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "alias_code": {
+          "type": "string"
+        },
+        "search_name": {
+          "type": "string"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "ApplicationModel": {
+      "required": [
+        "name",
+        "root_url"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "root_url": {
+          "type": "string"
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "created_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "modified_by": {
+          "type": "string"
+        },
+        "modified_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        },
+        "cookies": {
+          "type": "string"
+        },
+        "image": {
+          "format": "byte",
+          "type": "string"
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "Acp",
+              "Authentication",
+              "MemberStatus",
+              "ReadCustomerData",
+              "WriteCustomerData"
+            ],
+            "type": "string"
+          }
+        },
+        "customer_mappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ApplicationCustomerMapping"
+          }
+        },
+        "is_acp": {
+          "type": "boolean",
+          "readOnly": true
+        }
+      }
+    },
+    "ApplicationCustomerMapping": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "property_name": {
+          "type": "string"
+        },
+        "white_listed": {
+          "type": "boolean"
+        },
+        "visible": {
+          "type": "boolean"
+        }
+      }
+    },
+    "AppParameter": {
+      "required": [
+        "subsystem",
+        "parameter_name",
+        "parameter_value",
+        "description",
+        "add_oper"
+      ],
+      "type": "object",
+      "properties": {
+        "subsystem": {
+          "type": "string"
+        },
+        "parameter_name": {
+          "type": "string"
+        },
+        "parameter_value": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "comments": {
+          "type": "string"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "AcpAward": {
+      "required": [
+        "master_customer_id",
+        "nominee_status_code",
+        "awards_program_code",
+        "award_year",
+        "award_program",
+        "award_name",
+        "label_name",
+        "award_chapter_code",
+        "award_chapter_desc"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "nominee_status_code": {
+          "type": "string"
+        },
+        "nominee_status_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "awards_program_code": {
+          "type": "string"
+        },
+        "award_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "award_year": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "award_program": {
+          "type": "string"
+        },
+        "award_name": {
+          "type": "string"
+        },
+        "label_name": {
+          "type": "string"
+        },
+        "award_chapter_code": {
+          "type": "string"
+        },
+        "award_chapter_desc": {
+          "type": "string"
+        }
+      }
+    },
+    "AcpAwardProgram": {
+      "required": [
+        "award_code",
+        "award_program"
+      ],
+      "type": "object",
+      "properties": {
+        "award_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "award_code": {
+          "type": "string"
+        },
+        "award_program": {
+          "type": "string"
+        },
+        "award_year": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "active": {
+          "type": "boolean"
+        }
+      }
+    },
+    "LookupItem": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "Country": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "continent_code": {
+          "type": "string"
+        },
+        "continent_description": {
+          "type": "string"
+        },
+        "active_flag": {
+          "type": "string"
+        },
+        "phone_country_code": {
+          "type": "string"
+        },
+        "currency_code": {
+          "type": "string"
+        },
+        "iso_country_code": {
+          "type": "string"
+        },
+        "world_bank_region_code": {
+          "type": "string"
+        }
+      }
+    },
+    "State": {
+      "type": "object",
+      "properties": {
+        "country_code": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "active_flag": {
+          "type": "string"
+        }
+      }
+    },
+    "MedicalSchool": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "search_term": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state_code": {
+          "type": "string"
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "sam_designation": {
+          "type": "string"
+        },
+        "sam_designations": {
+          "type": "array",
+          "items": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "readOnly": true
+        }
+      }
+    },
+    "PersonifyCode": {
+      "type": "object",
+      "properties": {
+        "subsystem": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "active_flag": {
+          "type": "string"
+        },
+        "option1": {
+          "type": "string"
+        },
+        "option2": {
+          "type": "string"
+        },
+        "option3": {
+          "type": "string"
+        },
+        "option4": {
+          "type": "string"
+        },
+        "option5": {
+          "type": "string"
+        },
+        "option6": {
+          "type": "string"
+        },
+        "display_order": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "usr_web_description": {
+          "type": "string"
+        }
+      }
+    },
+    "PersonifySubCode": {
+      "type": "object",
+      "properties": {
+        "subsystem": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "sub_code": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "active_flag": {
+          "type": "string"
+        },
+        "option1": {
+          "type": "string"
+        },
+        "option2": {
+          "type": "string"
+        },
+        "option3": {
+          "type": "string"
+        },
+        "display_order": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "web_description": {
+          "type": "string"
+        }
+      }
+    },
+    "Customer": {
+      "required": [
+        "label_name",
+        "add_oper",
+        "add_date",
+        "customer_status_code"
+      ],
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "primary_email_address": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "middle_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "salutation": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "suffix": {
+          "type": "string"
+        },
+        "label_name": {
+          "type": "string"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "customer_status_code": {
+          "type": "string"
+        },
+        "dues_paid": {
+          "type": "boolean"
+        },
+        "usr_member_status_code": {
+          "type": "string"
+        },
+        "usr_member_status_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "usr_active_thru_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "member_class_code": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "member_class": {
+          "enum": [
+            "None",
+            "Master",
+            "Fellow",
+            "Member",
+            "Resident_Fellow_Member",
+            "Honorary_Fellow",
+            "Medical_Student_Fellow",
+            "Affiliate",
+            "Physician_Affiliate",
+            "Transitional"
+          ],
+          "type": "string"
+        },
+        "last_member_class": {
+          "enum": [
+            "None",
+            "Master",
+            "Fellow",
+            "Member",
+            "Resident_Fellow_Member",
+            "Honorary_Fellow",
+            "Medical_Student_Fellow",
+            "Affiliate",
+            "Physician_Affiliate",
+            "Transitional"
+          ],
+          "type": "string"
+        },
+        "last_member_class_code": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "customer_class_code": {
+          "type": "string"
+        },
+        "customer_class_description": {
+          "type": "string"
+        },
+        "region_code": {
+          "type": "string"
+        },
+        "region_description": {
+          "type": "string"
+        },
+        "chapter_code": {
+          "type": "string"
+        },
+        "chapter_description": {
+          "type": "string"
+        },
+        "gender_code": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "ethnicity_code": {
+          "type": "string"
+        },
+        "ethnicity": {
+          "type": "string"
+        },
+        "birth_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "current_im_registered_flag": {
+          "type": "boolean"
+        },
+        "primary_phone": {
+          "type": "string"
+        },
+        "primary_phone_type": {
+          "type": "string"
+        },
+        "mobile_phone": {
+          "type": "string"
+        },
+        "primary_fax": {
+          "type": "string"
+        },
+        "division": {
+          "type": "string"
+        },
+        "company_name": {
+          "type": "string"
+        },
+        "primary_address1": {
+          "type": "string"
+        },
+        "primary_address2": {
+          "type": "string"
+        },
+        "primary_city": {
+          "type": "string"
+        },
+        "primary_state_code": {
+          "type": "string"
+        },
+        "primary_postal_code": {
+          "type": "string"
+        },
+        "primary_country_code": {
+          "type": "string"
+        },
+        "primary_country_description": {
+          "type": "string"
+        },
+        "primary_address_status_code": {
+          "type": "string"
+        },
+        "city_state_zip": {
+          "type": "string",
+          "readOnly": true
+        },
+        "full_address": {
+          "type": "string",
+          "readOnly": true
+        },
+        "grad_year": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "medschool_code": {
+          "type": "string"
+        },
+        "medschool_description": {
+          "type": "string"
+        },
+        "other_med_school": {
+          "type": "string"
+        },
+        "primary_specialty_code": {
+          "type": "string"
+        },
+        "primary_specialty_description": {
+          "type": "string"
+        },
+        "secondary_specialty_code": {
+          "type": "string"
+        },
+        "secondary_specialty_description": {
+          "type": "string"
+        },
+        "proffessional_activity_description": {
+          "type": "string"
+        },
+        "present_employment_description": {
+          "type": "string"
+        },
+        "degrees": {
+          "type": "string"
+        },
+        "npi_number": {
+          "type": "string"
+        },
+        "abim_number": {
+          "type": "string"
+        },
+        "name_credentials": {
+          "type": "string"
+        },
+        "anticipated_degree": {
+          "type": "string"
+        },
+        "redacted": {
+          "type": "boolean"
+        },
+        "join_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "boards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Board"
+          }
+        },
+        "residencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Residency"
+          }
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Board": {
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "board_code": {
+          "type": "string"
+        },
+        "board_year": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "board_end_year": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "same_year": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "verified": {
+          "type": "boolean"
+        },
+        "comments": {
+          "type": "string"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Residency": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "residency_master_customer_id": {
+          "type": "string"
+        },
+        "label_name": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "begin_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "PagedResults[String]": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "start_index": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "filtered_number_of_records": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "total_number_of_records": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "MemberStatus": {
+      "required": [
+        "status",
+        "membership_types"
+      ],
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "membership_types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MembershipType"
+          }
+        }
+      }
+    },
+    "MembershipType": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "Membership": {
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "label_name": {
+          "type": "string"
+        },
+        "life_member": {
+          "type": "boolean"
+        },
+        "emeritus": {
+          "type": "boolean"
+        },
+        "auto_renew_enabled": {
+          "type": "boolean"
+        },
+        "member_class": {
+          "type": "string"
+        },
+        "member_class_descr": {
+          "type": "string"
+        },
+        "paid_through_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "payment_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "join_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "elect_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "NewMemberContext": {
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "membership_type": {
+          "type": "string"
+        },
+        "show_modal": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CensusData": {
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "prof_activity_code": {
+          "type": "string"
+        },
+        "prof_activity": {
+          "type": "string"
+        },
+        "primary_care_code": {
+          "type": "string"
+        },
+        "primary_care": {
+          "type": "string"
+        },
+        "practice_type_code": {
+          "type": "string"
+        },
+        "practice_type": {
+          "type": "string"
+        },
+        "practice_focus_type_code": {
+          "type": "string"
+        },
+        "practice_focus_type": {
+          "type": "string"
+        },
+        "primary_specialty_code": {
+          "type": "string"
+        },
+        "primary_specialty": {
+          "type": "string"
+        },
+        "secondary_specialty_code": {
+          "type": "string"
+        },
+        "secondary_specialty": {
+          "type": "string"
+        }
+      }
+    },
+    "Title": {
+      "type": "object",
+      "properties": {
+        "leadership_committee": {
+          "type": "string"
+        },
+        "position": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "is_active": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "start_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Order": {
+      "type": "object",
+      "properties": {
+        "order_no": {
+          "type": "string"
+        },
+        "order_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "order_status_code": {
+          "type": "string"
+        },
+        "bill_master_customer_id": {
+          "type": "string"
+        },
+        "bill_sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "ship_master_customer_id": {
+          "type": "string"
+        },
+        "ship_sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "ship_address_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "bill_customer_class_code": {
+          "type": "string"
+        },
+        "bill_customer_status_code": {
+          "type": "string"
+        },
+        "ship_customer_status_code": {
+          "type": "string"
+        },
+        "ship_customer_class_code": {
+          "type": "string"
+        },
+        "coupon_code": {
+          "type": "string"
+        },
+        "market_code": {
+          "type": "string"
+        },
+        "order_method": {
+          "type": "string"
+        },
+        "rate_structure": {
+          "type": "string"
+        },
+        "orig_order_no": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrderDetail"
+          }
+        }
+      }
+    },
+    "OrderDetail": {
+      "type": "object",
+      "properties": {
+        "order_no": {
+          "type": "string"
+        },
+        "order_line_no": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "order_qty": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "line_status_code": {
+          "type": "string"
+        },
+        "product_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "product_code": {
+          "type": "string"
+        },
+        "product_description": {
+          "type": "string"
+        },
+        "sub_system": {
+          "type": "string"
+        },
+        "rate_structure": {
+          "type": "string"
+        },
+        "rate_code": {
+          "type": "string"
+        },
+        "market_code": {
+          "type": "string"
+        },
+        "coupon_code": {
+          "type": "string"
+        },
+        "ship_master_customer_id": {
+          "type": "string"
+        },
+        "ship_sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "ship_address_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "orig_line_no": {
+          "type": "string"
+        },
+        "subtotal": {
+          "format": "double",
+          "type": "number"
+        },
+        "sales_tax": {
+          "format": "double",
+          "type": "number"
+        },
+        "shipping": {
+          "format": "double",
+          "type": "number"
+        },
+        "discount": {
+          "format": "double",
+          "type": "number"
+        },
+        "cycle_begin_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "cycle_end_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "CustomerRelationship": {
+      "required": [
+        "master_customer_id",
+        "related_name",
+        "relationship_type",
+        "relationship_code",
+        "reciprocal_code"
+      ],
+      "type": "object",
+      "properties": {
+        "relationship_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "related_master_customer_id": {
+          "type": "string"
+        },
+        "related_sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "related_name": {
+          "type": "string"
+        },
+        "relationship_type": {
+          "type": "string"
+        },
+        "relationship_code": {
+          "type": "string"
+        },
+        "reciprocal_code": {
+          "type": "string"
+        },
+        "reciprocal_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "begin_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "primary_employer_flag": {
+          "type": "boolean"
+        },
+        "full_time_flag": {
+          "type": "boolean"
+        },
+        "job_function_code": {
+          "type": "string"
+        },
+        "supervisor_name": {
+          "type": "string"
+        },
+        "primary_contact_flag": {
+          "type": "boolean"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "comments": {
+          "type": "string"
+        },
+        "active_flag": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Demographic": {
+      "type": "object",
+      "properties": {
+        "cus_demographic_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "demographic_code": {
+          "type": "string"
+        },
+        "demographic_code_description": {
+          "type": "string"
+        },
+        "demographic_subcode": {
+          "type": "string"
+        },
+        "demographic_subcode_description": {
+          "type": "string"
+        },
+        "user_d1": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "user_d2": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "user_n1": {
+          "format": "double",
+          "type": "number"
+        },
+        "comments": {
+          "type": "string"
+        },
+        "error_message": {
+          "type": "string"
+        }
+      }
+    },
+    "Activity": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "Unset",
+            "Ok",
+            "Error"
+          ],
+          "type": "string",
+          "readOnly": true
+        },
+        "status_description": {
+          "type": "string",
+          "readOnly": true
+        },
+        "has_remote_parent": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "kind": {
+          "enum": [
+            "Internal",
+            "Server",
+            "Client",
+            "Producer",
+            "Consumer"
+          ],
+          "type": "string",
+          "readOnly": true
+        },
+        "operation_name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/definitions/ActivitySource",
+          "readOnly": true
+        },
+        "parent": {
+          "$ref": "#/definitions/Activity",
+          "readOnly": true
+        },
+        "duration": {
+          "type": "string",
+          "readOnly": true
+        },
+        "start_time_utc": {
+          "format": "date-time",
+          "type": "string",
+          "readOnly": true
+        },
+        "id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "parent_id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "root_id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KeyValuePair[String,String]"
+          },
+          "readOnly": true
+        },
+        "tag_objects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KeyValuePair[String,Object]"
+          },
+          "readOnly": true
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ActivityEvent"
+          },
+          "readOnly": true
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ActivityLink"
+          },
+          "readOnly": true
+        },
+        "baggage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KeyValuePair[String,String]"
+          },
+          "readOnly": true
+        },
+        "context": {
+          "$ref": "#/definitions/ActivityContext",
+          "readOnly": true
+        },
+        "trace_state_string": {
+          "type": "string"
+        },
+        "span_id": {
+          "$ref": "#/definitions/ActivitySpanId",
+          "readOnly": true
+        },
+        "trace_id": {
+          "$ref": "#/definitions/ActivityTraceId",
+          "readOnly": true
+        },
+        "recorded": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "is_all_data_requested": {
+          "type": "boolean"
+        },
+        "activity_trace_flags": {
+          "enum": [
+            "None",
+            "Recorded"
+          ],
+          "type": "string"
+        },
+        "parent_span_id": {
+          "$ref": "#/definitions/ActivitySpanId",
+          "readOnly": true
+        },
+        "is_stopped": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "id_format": {
+          "enum": [
+            "Unknown",
+            "Hierarchical",
+            "W3C"
+          ],
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "ActivitySource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "version": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "KeyValuePair[String,String]": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "readOnly": true
+        },
+        "value": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "KeyValuePair[String,Object]": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "readOnly": true
+        },
+        "value": {
+          "type": "object",
+          "readOnly": true
+        }
+      }
+    },
+    "ActivityEvent": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "timestamp": {
+          "format": "date-time",
+          "type": "string",
+          "readOnly": true
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KeyValuePair[String,Object]"
+          },
+          "readOnly": true
+        }
+      }
+    },
+    "ActivityLink": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "$ref": "#/definitions/ActivityContext",
+          "readOnly": true
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/KeyValuePair[String,Object]"
+          },
+          "readOnly": true
+        }
+      }
+    },
+    "ActivityContext": {
+      "type": "object",
+      "properties": {
+        "trace_id": {
+          "$ref": "#/definitions/ActivityTraceId",
+          "readOnly": true
+        },
+        "span_id": {
+          "$ref": "#/definitions/ActivitySpanId",
+          "readOnly": true
+        },
+        "trace_flags": {
+          "enum": [
+            "None",
+            "Recorded"
+          ],
+          "type": "string",
+          "readOnly": true
+        },
+        "trace_state": {
+          "type": "string",
+          "readOnly": true
+        },
+        "is_remote": {
+          "type": "boolean",
+          "readOnly": true
+        }
+      }
+    },
+    "ActivitySpanId": {
+      "type": "object",
+      "properties": {}
+    },
+    "ActivityTraceId": {
+      "type": "object",
+      "properties": {}
+    },
+    "CustomerCommunication": {
+      "required": [
+        "master_customer_id",
+        "communication_type",
+        "communication_location",
+        "communication_value"
+      ],
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "communication_type": {
+          "type": "string"
+        },
+        "communication_location": {
+          "type": "string"
+        },
+        "is_primary": {
+          "type": "boolean"
+        },
+        "is_active": {
+          "type": "boolean"
+        },
+        "communication_value": {
+          "type": "string"
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "phone_country_code": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "mod_oper": {
+          "type": "string"
+        }
+      }
+    },
+    "ValueObject": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "RegisterModel": {
+      "required": [
+        "password",
+        "confirm_password",
+        "email",
+        "user_name",
+        "first_name",
+        "last_name"
+      ],
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string"
+        },
+        "confirm_password": {
+          "type": "string"
+        },
+        "birth_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "medical_background": {
+          "enum": [
+            "MedicalStudent",
+            "PhysicianInResidency",
+            "PhysicianPostTraining",
+            "NonPhysician",
+            "Other",
+            "Media",
+            "NoneOfAbove"
+          ],
+          "type": "string"
+        },
+        "demographic": {
+          "type": "string"
+        },
+        "medschool_code": {
+          "type": "string"
+        },
+        "grad_year": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "degrees": {
+          "type": "string"
+        },
+        "ethnicity_code": {
+          "type": "string"
+        },
+        "gender_code": {
+          "type": "string"
+        },
+        "specialty": {
+          "type": "string"
+        },
+        "work_place": {
+          "type": "string"
+        },
+        "division": {
+          "type": "string"
+        },
+        "company_name": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "address1": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "address2": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "address_city": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "address_state": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "address_zip": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "address_country": {
+          "type": "string"
+        },
+        "phone_country": {
+          "type": "string"
+        },
+        "phone_area_code": {
+          "type": "string"
+        },
+        "phone_type": {
+          "type": "string"
+        },
+        "credentials": {
+          "type": "string"
+        },
+        "include_in_mailings": {
+          "type": "boolean"
+        },
+        "validate_address": {
+          "type": "boolean"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "email": {
+          "pattern": "^[a-zA-Z0-9]+(?:[a-zA-Z0-9&,!$%&'`|{\\]\\[}~*+/=?^#@._-]+)*[a-zA-Z0-9]@[a-zA-Z0-9-.]+\\.[a-zA-Z]{2,}$",
+          "type": "string"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "salutation": {
+          "type": "string"
+        },
+        "first_name": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "last_name": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "middle_initial": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "suffix": {
+          "type": "string"
+        },
+        "label_name": {
+          "type": "string"
+        },
+        "member_class": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "member_class_description": {
+          "enum": [
+            "None",
+            "Master",
+            "Fellow",
+            "Member",
+            "Resident_Fellow_Member",
+            "Honorary_Fellow",
+            "Medical_Student_Fellow",
+            "Affiliate",
+            "Physician_Affiliate",
+            "Transitional"
+          ],
+          "type": "string",
+          "readOnly": true
+        },
+        "customer_status_code": {
+          "type": "string"
+        },
+        "customer_class_code": {
+          "type": "string"
+        },
+        "phone_number": {
+          "type": "string"
+        },
+        "extension": {
+          "type": "string"
+        },
+        "chapter": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "email_verified": {
+          "type": "boolean"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "AddSpecialtyModel": {
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "specialty_code": {
+          "type": "string"
+        },
+        "priority_code": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "specialty_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "specialty_method_code": {
+          "type": "string"
+        },
+        "comments": {
+          "type": "string"
+        },
+        "add_oper": {
+          "type": "string"
+        }
+      }
+    },
+    "AcpActivity": {
+      "required": [
+        "master_customer_id",
+        "activity_code",
+        "activity_text",
+        "add_oper"
+      ],
+      "type": "object",
+      "properties": {
+        "cus_activity_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "activity_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "activity_code": {
+          "type": "string"
+        },
+        "activity_code_description": {
+          "type": "string"
+        },
+        "activity_subcode": {
+          "type": "string"
+        },
+        "activity_subcode_description": {
+          "type": "string"
+        },
+        "sub_system": {
+          "type": "string"
+        },
+        "activity_text": {
+          "type": "string"
+        },
+        "comments": {
+          "type": "string"
+        },
+        "error_message": {
+          "type": "string"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "ActivitySubcodeContext": {
+      "required": [
+        "master_customer_id",
+        "activity_code",
+        "activity_subcode",
+        "mod_oper"
+      ],
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "activity_code": {
+          "type": "string"
+        },
+        "activity_subcode": {
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "org_id": {
+          "type": "string",
+          "readOnly": true
+        },
+        "org_unit_id": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "OptIn": {
+      "type": "object",
+      "properties": {
+        "cus_opt_in_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "option_type_code": {
+          "type": "string"
+        },
+        "option_short_name": {
+          "type": "string"
+        },
+        "option_short_subname": {
+          "type": "string"
+        },
+        "option_descr": {
+          "type": "string"
+        },
+        "opted_in_flag": {
+          "type": "string"
+        },
+        "opt_out_reason_code": {
+          "type": "string"
+        },
+        "comments": {
+          "type": "string"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "error_message": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "opted_in_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "opt_in_expiration_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "opted_out_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "concurrency_id": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "OptInModel": {
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "option_type_code": {
+          "type": "string"
+        },
+        "option_short_name": {
+          "type": "string"
+        },
+        "option_short_subname": {
+          "type": "string"
+        },
+        "expiration_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "comments": {
+          "type": "string"
+        },
+        "product_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "mod_or_add_oper": {
+          "type": "string"
+        }
+      }
+    },
+    "OptOutModel": {
+      "type": "object",
+      "properties": {
+        "opt_out_reason_code": {
+          "type": "string"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "option_type_code": {
+          "type": "string"
+        },
+        "option_short_name": {
+          "type": "string"
+        },
+        "option_short_subname": {
+          "type": "string"
+        },
+        "expiration_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "comments": {
+          "type": "string"
+        },
+        "product_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "mod_or_add_oper": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomerRelationshipPost": {
+      "required": [
+        "name",
+        "operator",
+        "master_customer_id",
+        "related_name",
+        "relationship_type",
+        "relationship_code",
+        "reciprocal_code"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "operator": {
+          "type": "string"
+        },
+        "relationship_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "related_master_customer_id": {
+          "type": "string"
+        },
+        "related_sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "related_name": {
+          "type": "string"
+        },
+        "relationship_type": {
+          "type": "string"
+        },
+        "relationship_code": {
+          "type": "string"
+        },
+        "reciprocal_code": {
+          "type": "string"
+        },
+        "reciprocal_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "begin_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "primary_employer_flag": {
+          "type": "boolean"
+        },
+        "full_time_flag": {
+          "type": "boolean"
+        },
+        "job_function_code": {
+          "type": "string"
+        },
+        "supervisor_name": {
+          "type": "string"
+        },
+        "primary_contact_flag": {
+          "type": "boolean"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "comments": {
+          "type": "string"
+        },
+        "active_flag": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CustomerCredentials": {
+      "required": [
+        "master_customer_id",
+        "credentials"
+      ],
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "credentials": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomerNameProperties": {
+      "required": [
+        "master_customer_id"
+      ],
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "middle_name": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "suffix": {
+          "type": "string"
+        },
+        "grad_year": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "allow_label_sales_flag": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CensusDate": {
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "usr_census_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "CustomerWorkPlace": {
+      "required": [
+        "master_customer_id",
+        "work_place_code"
+      ],
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "work_place_code": {
+          "type": "string"
+        }
+      }
+    },
+    "AcpResidencyProgram": {
+      "type": "object",
+      "properties": {
+        "program_id": {
+          "type": "string"
+        },
+        "program_title": {
+          "type": "string"
+        },
+        "program_type_code": {
+          "type": "string"
+        },
+        "program_type_name": {
+          "type": "string"
+        },
+        "company_name": {
+          "type": "string"
+        },
+        "division": {
+          "type": "string"
+        },
+        "address_line1": {
+          "type": "string"
+        },
+        "address_line2": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "fax": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "CmeProgram": {
+      "type": "object",
+      "properties": {
+        "program_id": {
+          "type": "string"
+        },
+        "program_title": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "start_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "valid_until_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "credits_allowed": {
+          "format": "double",
+          "type": "number"
+        },
+        "program_classification": {
+          "type": "string"
+        }
+      }
+    },
+    "CreditClaim": {
+      "required": [
+        "master_customer_id",
+        "program_id"
+      ],
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "program_id": {
+          "type": "string"
+        },
+        "sub_program": {
+          "type": "string"
+        },
+        "credits_claimed": {
+          "format": "double",
+          "type": "number"
+        }
+      }
+    },
+    "CreditClaimContext[CmeCreditClaim]": {
+      "type": "object",
+      "properties": {
+        "claim": {
+          "$ref": "#/definitions/CmeCreditClaim"
+        },
+        "error_message": {
+          "type": "string"
+        }
+      }
+    },
+    "CmeCreditClaim": {
+      "required": [
+        "master_customer_id",
+        "program_id"
+      ],
+      "type": "object",
+      "properties": {
+        "trn_cus_transcript_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "cme_program": {
+          "$ref": "#/definitions/CmeProgram"
+        },
+        "claim_submitted_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "claim_status_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "credits_approved": {
+          "format": "double",
+          "type": "number"
+        },
+        "claim_status": {
+          "type": "string"
+        },
+        "credit_type_code": {
+          "type": "string"
+        },
+        "activity_type_code": {
+          "type": "string"
+        },
+        "activity_type_descr": {
+          "type": "string"
+        },
+        "content_type_code": {
+          "type": "string"
+        },
+        "content_type_descr": {
+          "type": "string"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "program_id": {
+          "type": "string"
+        },
+        "sub_program": {
+          "type": "string"
+        },
+        "credits_claimed": {
+          "format": "double",
+          "type": "number"
+        }
+      }
+    },
+    "CmeSurveyResult": {
+      "required": [
+        "master_customer_id",
+        "product_id",
+        "question_id"
+      ],
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "product_id": {
+          "type": "string"
+        },
+        "question_id": {
+          "type": "string"
+        },
+        "response": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CreditClaimMocWithBirthDay": {
+      "required": [
+        "abim_number",
+        "first_name",
+        "last_name",
+        "master_customer_id",
+        "program_id"
+      ],
+      "type": "object",
+      "properties": {
+        "birth_day": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "abim_number": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "program_id": {
+          "type": "string"
+        },
+        "sub_program": {
+          "type": "string"
+        },
+        "credits_claimed": {
+          "format": "double",
+          "type": "number"
+        }
+      }
+    },
+    "MocCreditClaim": {
+      "required": [
+        "abim_number",
+        "first_name",
+        "last_name",
+        "master_customer_id",
+        "program_id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "product_id": {
+          "type": "string"
+        },
+        "date_claimed": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "abim_number": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "program_id": {
+          "type": "string"
+        },
+        "sub_program": {
+          "type": "string"
+        },
+        "credits_claimed": {
+          "format": "double",
+          "type": "number"
+        }
+      }
+    },
+    "AcpRegion": {
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "region_name": {
+          "type": "string"
+        },
+        "region_code": {
+          "type": "string"
+        }
+      }
+    },
+    "HospitalistOrderCancelContext": {
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        }
+      }
+    },
+    "MbrProductPostalLink": {
+      "type": "object",
+      "properties": {
+        "mbr_product_postal_link_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "product_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "postal_code_from": {
+          "type": "string"
+        },
+        "postal_code_to": {
+          "type": "string"
+        },
+        "usr_region_code": {
+          "type": "string"
+        },
+        "usr_chapter_code": {
+          "type": "string"
+        }
+      }
+    },
+    "PagedResults[Customer]": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "start_index": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "filtered_number_of_records": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "total_number_of_records": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Customer"
+          }
+        }
+      }
+    },
+    "AcpMessage": {
+      "required": [
+        "text"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "category": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "category_description": {
+          "enum": [
+            "success",
+            "info",
+            "warning",
+            "error"
+          ],
+          "type": "string"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "begin_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "created": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "updated": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "updated_by": {
+          "type": "string"
+        }
+      }
+    },
+    "Session": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string"
+        },
+        "refresh_token": {
+          "type": "string"
+        },
+        "created": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "expires": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "application_name": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "ip_address": {
+          "type": "string"
+        },
+        "token_type": {
+          "type": "string",
+          "readOnly": true
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "legacy_encryption": {
+          "type": "string"
+        },
+        "expires_in": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        }
+      }
+    },
+    "OAuthTokenModel": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "refresh_token": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "acpcookie": {
+          "type": "string"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        },
+        "grant_type": {
+          "type": "string"
+        }
+      }
+    },
+    "UserModel": {
+      "required": [
+        "email",
+        "user_name",
+        "first_name",
+        "last_name"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "password_hash": {
+          "type": "string"
+        },
+        "primary_email_address": {
+          "type": "string"
+        },
+        "email_update_required": {
+          "type": "boolean"
+        },
+        "last_logon": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "login_disabled": {
+          "type": "boolean"
+        },
+        "password_change_required": {
+          "type": "boolean"
+        },
+        "dues_paid": {
+          "type": "boolean"
+        },
+        "chapter_description": {
+          "type": "string"
+        },
+        "region_description": {
+          "type": "string"
+        },
+        "last_first": {
+          "type": "string",
+          "readOnly": true
+        },
+        "first_last": {
+          "type": "string",
+          "readOnly": true
+        },
+        "email": {
+          "pattern": "^[a-zA-Z0-9]+(?:[a-zA-Z0-9&,!$%&'`|{\\]\\[}~*+/=?^#@._-]+)*[a-zA-Z0-9]@[a-zA-Z0-9-.]+\\.[a-zA-Z]{2,}$",
+          "type": "string"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "salutation": {
+          "type": "string"
+        },
+        "first_name": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "last_name": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "middle_initial": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "suffix": {
+          "type": "string"
+        },
+        "label_name": {
+          "type": "string"
+        },
+        "member_class": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "member_class_description": {
+          "enum": [
+            "None",
+            "Master",
+            "Fellow",
+            "Member",
+            "Resident_Fellow_Member",
+            "Honorary_Fellow",
+            "Medical_Student_Fellow",
+            "Affiliate",
+            "Physician_Affiliate",
+            "Transitional"
+          ],
+          "type": "string",
+          "readOnly": true
+        },
+        "customer_status_code": {
+          "type": "string"
+        },
+        "customer_class_code": {
+          "type": "string"
+        },
+        "phone_number": {
+          "type": "string"
+        },
+        "extension": {
+          "type": "string"
+        },
+        "chapter": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "email_verified": {
+          "type": "boolean"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "IntrospectionRequest": {
+      "required": [
+        "token"
+      ],
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "token_type_hint": {
+          "type": "string"
+        }
+      }
+    },
+    "IntrospectionResponse": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "token_type": {
+          "type": "string"
+        },
+        "exp": {
+          "format": "int64",
+          "type": "integer"
+        }
+      }
+    },
+    "AcpOrderRequest": {
+      "required": [
+        "ship_master_customer_id",
+        "add_oper",
+        "order_request_details"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "ship_master_customer_id": {
+          "type": "string"
+        },
+        "ship_sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "ship_address_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "ship_address_type_code": {
+          "type": "string"
+        },
+        "bill_master_customer_id": {
+          "type": "string"
+        },
+        "bill_sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "bill_address_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "bill_address_type_code": {
+          "type": "string"
+        },
+        "rate_code": {
+          "type": "string"
+        },
+        "rate_structure": {
+          "type": "string"
+        },
+        "market_code": {
+          "type": "string"
+        },
+        "coupon_code": {
+          "type": "string"
+        },
+        "is_fourth_quarter_renew_order": {
+          "type": "boolean"
+        },
+        "check_for_existing": {
+          "type": "boolean"
+        },
+        "status_code": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "status_description": {
+          "type": "string"
+        },
+        "retries": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "order_no": {
+          "type": "string"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "order_request_details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AcpOrderRequestDetail"
+          }
+        }
+      }
+    },
+    "AcpOrderRequestDetail": {
+      "required": [
+        "order_queue_id",
+        "ship_master_customer_id",
+        "product_id",
+        "add_oper",
+        "add_date"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "order_queue_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "ship_master_customer_id": {
+          "type": "string"
+        },
+        "ship_sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "ship_address_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "ship_address_type_code": {
+          "type": "string"
+        },
+        "product_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "rate_code": {
+          "type": "string"
+        },
+        "rate_structure": {
+          "type": "string"
+        },
+        "market_code": {
+          "type": "string"
+        },
+        "coupon_code": {
+          "type": "string"
+        },
+        "discount_code": {
+          "type": "string"
+        },
+        "quantity": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "initial_begin_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "begin_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "discount_amount": {
+          "format": "double",
+          "type": "number"
+        },
+        "shipping_amount": {
+          "format": "double",
+          "type": "number"
+        },
+        "allow_back_order": {
+          "type": "boolean"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Product": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "org_id": {
+          "type": "string"
+        },
+        "org_unit_id": {
+          "type": "string"
+        },
+        "parent_product": {
+          "type": "string"
+        },
+        "subsystem": {
+          "type": "string"
+        },
+        "short_name": {
+          "type": "string"
+        },
+        "long_name": {
+          "type": "string"
+        },
+        "master_product_flag": {
+          "type": "string"
+        },
+        "product_type_code": {
+          "type": "string"
+        },
+        "pricing_method_code": {
+          "type": "string"
+        },
+        "package_discount_pct": {
+          "format": "double",
+          "type": "number"
+        },
+        "product_class_code": {
+          "type": "string"
+        },
+        "product_status_code": {
+          "type": "string"
+        },
+        "product_status_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "unit_of_measure_code": {
+          "type": "string"
+        },
+        "quanitity_per_unit": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "available_to_orders_flag": {
+          "type": "string"
+        },
+        "available_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "expiration_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "renewable_flag": {
+          "type": "string"
+        },
+        "returnable_flag": {
+          "type": "string"
+        },
+        "standing_order_backiss_flag": {
+          "type": "string"
+        },
+        "last_sold_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "cum_sold_qty": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "ytd_sold_qty": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "description_text_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "campaign_exclusive_flag": {
+          "type": "string"
+        },
+        "fund_exclusive_flag": {
+          "type": "string"
+        },
+        "appeal_exclusive_flag": {
+          "type": "string"
+        },
+        "valid_flag": {
+          "type": "string"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "concurrency_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "create_transaction_flag": {
+          "type": "string"
+        },
+        "members_only_flag": {
+          "type": "string"
+        },
+        "direct_price_update_flag": {
+          "type": "string"
+        },
+        "eligible_for_commission_flag": {
+          "type": "string"
+        },
+        "tax_category_code": {
+          "type": "string"
+        },
+        "taxware_code": {
+          "type": "string"
+        },
+        "master_product": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "available_to_order": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "renewable": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "returnable": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "standing_order_backiss": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "campaign_exclusive": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "fund_exclusive": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "appeal_exclusive": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "valid": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "create_transaction": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "members_only": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "direct_price_update": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "eligible_for_commission": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "product_pricings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProductPricing"
+          }
+        },
+        "product_texts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProductText"
+          }
+        },
+        "product_components": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProductComponent"
+          }
+        }
+      }
+    },
+    "ProductPricing": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "rate_structure": {
+          "type": "string"
+        },
+        "rate_code": {
+          "type": "string"
+        },
+        "currency_code": {
+          "type": "string"
+        },
+        "price_begin_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "price_end_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "min_price": {
+          "format": "double",
+          "type": "number"
+        },
+        "max_price": {
+          "format": "double",
+          "type": "number"
+        },
+        "writeoff_tolerance": {
+          "format": "double",
+          "type": "number"
+        },
+        "price": {
+          "format": "double",
+          "type": "number"
+        },
+        "use_schedule_flag": {
+          "type": "string"
+        },
+        "fair_market_value": {
+          "format": "double",
+          "type": "number"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "concurrency_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "pct_fee_amount": {
+          "format": "double",
+          "type": "number"
+        },
+        "use_adv_schedule_flag": {
+          "type": "string"
+        },
+        "schedule_id": {
+          "type": "string"
+        },
+        "adv_schedule_id": {
+          "type": "string"
+        },
+        "pct_calculation_method_code": {
+          "type": "string"
+        },
+        "price_pct": {
+          "format": "double",
+          "type": "number"
+        },
+        "use_adv_rate_card_pricing_flag": {
+          "type": "string"
+        },
+        "adv_rate_card_begin_year_code": {
+          "type": "string"
+        },
+        "adv_rate_card_end_year_code": {
+          "type": "string"
+        },
+        "display_sale_price_flag": {
+          "type": "string"
+        },
+        "comparison_price": {
+          "format": "double",
+          "type": "number"
+        },
+        "display_end_date_flag": {
+          "type": "string"
+        },
+        "use_schedule": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "use_adv_schedule": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "display_sale_price": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "display_end_date": {
+          "type": "boolean",
+          "readOnly": true
+        }
+      }
+    },
+    "ProductText": {
+      "type": "object",
+      "properties": {
+        "product_text_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "language": {
+          "type": "string"
+        },
+        "product_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "text_type_code": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "concurrency_id": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "ProductComponent": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "component_product_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "component_qty": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "active_flag": {
+          "type": "string"
+        },
+        "rate_method_code": {
+          "type": "string"
+        },
+        "rate_structure": {
+          "type": "string"
+        },
+        "rate_code": {
+          "type": "string"
+        },
+        "waive_shipping_flag": {
+          "type": "string"
+        },
+        "standing_order_status_code": {
+          "type": "string"
+        },
+        "standing_order_ship_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "order_lines_to_be_created": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_oper": {
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "concurrency_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "related_component_product_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "priority_seq": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "UpgradeProduct": {
+      "type": "object",
+      "properties": {
+        "url_base": {
+          "type": "string"
+        },
+        "upgrade_product_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "return_coupon": {
+          "type": "string"
+        },
+        "error_code": {
+          "type": "string"
+        }
+      }
+    },
+    "GetMembershipOrderPreviewInput": {
+      "required": [
+        "master_customer_id",
+        "rate_structure",
+        "rate_code"
+      ],
+      "type": "object",
+      "properties": {
+        "membership_product_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "rate_structure": {
+          "type": "string"
+        },
+        "rate_code": {
+          "type": "string"
+        },
+        "session_state_key": {
+          "type": "string",
+          "readOnly": true
+        },
+        "excluded_chapters_from_web_join": {
+          "type": "string"
+        }
+      }
+    },
+    "GetMembershipOrderPreviewOutput": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "format": "double",
+          "type": "number"
+        },
+        "amount_to_pay": {
+          "format": "double",
+          "type": "number"
+        },
+        "unit_price": {
+          "format": "double",
+          "type": "number"
+        },
+        "best_rate_structure": {
+          "type": "string"
+        },
+        "discount_amount": {
+          "format": "double",
+          "type": "number"
+        },
+        "gst_tax_amount": {
+          "format": "double",
+          "type": "number"
+        },
+        "hst_tac_amount": {
+          "format": "double",
+          "type": "number"
+        },
+        "internal_key": {
+          "type": "string"
+        },
+        "membership_begin_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "membership_end_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "product_renewable_flag": {
+          "type": "boolean"
+        },
+        "rate_structures": {
+          "type": "string"
+        },
+        "tax_amount": {
+          "format": "double",
+          "type": "number"
+        }
+      }
+    },
+    "ProductBenefit": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "sub_product_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "rate_code": {
+          "type": "string"
+        },
+        "rate_structure": {
+          "type": "string"
+        },
+        "short_name": {
+          "type": "string"
+        },
+        "long_name": {
+          "type": "string"
+        },
+        "web_long_description": {
+          "type": "string"
+        },
+        "web_short_description": {
+          "type": "string"
+        }
+      }
+    },
+    "AcpProgram": {
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "label_name": {
+          "type": "string"
+        },
+        "search_name": {
+          "type": "string"
+        },
+        "alias_code": {
+          "type": "string"
+        },
+        "cus_address_id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "priority_seq": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "primary_address_country_code": {
+          "type": "string"
+        },
+        "primary_address_country_desc": {
+          "type": "string"
+        },
+        "primary_address_state": {
+          "type": "string"
+        },
+        "primary_address_state_code": {
+          "type": "string"
+        },
+        "primary_address_city": {
+          "type": "string"
+        }
+      }
+    },
+    "ProxyItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "start_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "sort_order": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "add_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "mod_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "Role": {
+      "type": "object",
+      "properties": {
+        "role_code": {
+          "type": "string"
+        },
+        "role_subcode": {
+          "type": "string"
+        }
+      }
+    },
+    "RegisterSessionModel": {
+      "required": [
+        "client_id",
+        "client_secret",
+        "password",
+        "confirm_password",
+        "email",
+        "user_name",
+        "first_name",
+        "last_name"
+      ],
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "confirm_password": {
+          "type": "string"
+        },
+        "birth_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "medical_background": {
+          "enum": [
+            "MedicalStudent",
+            "PhysicianInResidency",
+            "PhysicianPostTraining",
+            "NonPhysician",
+            "Other",
+            "Media",
+            "NoneOfAbove"
+          ],
+          "type": "string"
+        },
+        "demographic": {
+          "type": "string"
+        },
+        "medschool_code": {
+          "type": "string"
+        },
+        "grad_year": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "degrees": {
+          "type": "string"
+        },
+        "ethnicity_code": {
+          "type": "string"
+        },
+        "gender_code": {
+          "type": "string"
+        },
+        "specialty": {
+          "type": "string"
+        },
+        "work_place": {
+          "type": "string"
+        },
+        "division": {
+          "type": "string"
+        },
+        "company_name": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "address1": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "address2": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "address_city": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "address_state": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "address_zip": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "address_country": {
+          "type": "string"
+        },
+        "phone_country": {
+          "type": "string"
+        },
+        "phone_area_code": {
+          "type": "string"
+        },
+        "phone_type": {
+          "type": "string"
+        },
+        "credentials": {
+          "type": "string"
+        },
+        "include_in_mailings": {
+          "type": "boolean"
+        },
+        "validate_address": {
+          "type": "boolean"
+        },
+        "add_oper": {
+          "type": "string"
+        },
+        "email": {
+          "pattern": "^[a-zA-Z0-9]+(?:[a-zA-Z0-9&,!$%&'`|{\\]\\[}~*+/=?^#@._-]+)*[a-zA-Z0-9]@[a-zA-Z0-9-.]+\\.[a-zA-Z]{2,}$",
+          "type": "string"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "salutation": {
+          "type": "string"
+        },
+        "first_name": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "last_name": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "middle_initial": {
+          "pattern": "^[A-Za-z0-9-., ]*$",
+          "type": "string"
+        },
+        "suffix": {
+          "type": "string"
+        },
+        "label_name": {
+          "type": "string"
+        },
+        "member_class": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "member_class_description": {
+          "enum": [
+            "None",
+            "Master",
+            "Fellow",
+            "Member",
+            "Resident_Fellow_Member",
+            "Honorary_Fellow",
+            "Medical_Student_Fellow",
+            "Affiliate",
+            "Physician_Affiliate",
+            "Transitional"
+          ],
+          "type": "string",
+          "readOnly": true
+        },
+        "customer_status_code": {
+          "type": "string"
+        },
+        "customer_class_code": {
+          "type": "string"
+        },
+        "phone_number": {
+          "type": "string"
+        },
+        "extension": {
+          "type": "string"
+        },
+        "chapter": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "email_verified": {
+          "type": "boolean"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "UpdatePasswordModel": {
+      "type": "object",
+      "properties": {
+        "oldpassword": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "grant_type": {
+          "type": "string",
+          "readOnly": true
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        }
+      }
+    },
+    "VendorSecurityTokenContext": {
+      "required": [
+        "return_url"
+      ],
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "user_name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "return_url": {
+          "type": "string"
+        }
+      }
+    },
+    "GenericLoginModel": {
+      "type": "object",
+      "properties": {
+        "user_name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomerContext": {
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "success": {
+          "type": "boolean",
+          "readOnly": true
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "UsrRole": {
+      "type": "object",
+      "properties": {
+        "role_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "descr": {
+          "type": "string"
+        },
+        "master_customer_id": {
+          "type": "string"
+        },
+        "sub_customer_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "comments": {
+          "type": "string"
+        },
+        "begin_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "role_code": {
+          "type": "string"
+        },
+        "role_subcode": {
+          "type": "string"
+        }
+      }
+    },
+    "UserGroup": {
+      "type": "object",
+      "properties": {
+        "master_customer_id": {
+          "type": "string"
+        },
+        "access_group": {
+          "type": "string"
+        },
+        "begin_date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "end_date": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "PersonifySSOSession": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "type": "string"
+        }
+      }
+    },
+    "PersonifyCustomerToken": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "StoredProc": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "LogMessage": {
+      "required": [
+        "client_id",
+        "message_text"
+      ],
+      "type": "object",
+      "properties": {
+        "log_message_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "application_name": {
+          "type": "string"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "request_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "message_class_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "message_class_name": {
+          "type": "string"
+        },
+        "message_severity_id": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "message_severity_description": {
+          "enum": [
+            "Debug",
+            "Information",
+            "Warning",
+            "Error",
+            "Fatal"
+          ],
+          "type": "string"
+        },
+        "message_text": {
+          "type": "string"
+        },
+        "stack_trace": {
+          "type": "string"
+        },
+        "message_date_time": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "time_stamp": {
+          "format": "byte",
+          "type": "string"
+        }
+      }
+    },
+    "NotificationModel": {
+      "required": [
+        "client_id",
+        "subject",
+        "body"
+      ],
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string"
+        },
+        "message_class_id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "message_class_name": {
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "Debug",
+            "Information",
+            "Warning",
+            "Error",
+            "Fatal"
+          ],
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            "Normal",
+            "Low",
+            "High"
+          ],
+          "type": "string"
+        },
+        "html_encoded": {
+          "type": "boolean"
+        }
+      }
+    },
+    "SendEmailModel": {
+      "required": [
+        "to",
+        "subject",
+        "body"
+      ],
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "from_name": {
+          "type": "string"
+        },
+        "to": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "subject": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            "Normal",
+            "Low",
+            "High"
+          ],
+          "type": "string"
+        },
+        "html_encoded": {
+          "type": "boolean"
+        }
+      }
+    },
+    "RequestLog": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "scheme": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        }
+      }
+    },
+    "Password": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "PasswordContext": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "oauth2": {
+      "type": "oauth2",
+      "description": "OAuth2 Implicit Grant",
+      "flow": "implicit",
+      "authorizationUrl": "https://webapi.acponline.org/oauth",
+      "tokenUrl": "https://webapi.acponline.org/token",
+      "scopes": {}
+    }
+  }
+}

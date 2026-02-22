@@ -1,0 +1,33 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // User profiles - users can read any profile, but only write their own
+    match /users/{userId} {
+      // Anyone authenticated can read user profiles (for displaying author names)
+      allow read: if request.auth != null;
+      
+      // Users can only create/update their own profile
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+      
+      // Users cannot delete profiles
+      allow delete: if false;
+    }
+    
+    // Artifacts - static exhibit content; only high-level users can create/update/delete
+    match /artifacts/{artifactId} {
+      // Anyone authenticated can read artifacts
+      allow read: if request.auth != null;
+      
+      // Only high-level users can create, update, or delete artifacts
+      allow create, update, delete: if request.auth != null
+        && request.auth.token.highLevel == true;
+    }
+    
+    // Default: deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "rules": {
+    "posts": {
+      "$postId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (
+          !data.exists() && newData.child('authorId').val() == auth.uid ||
+          data.exists() && (
+            auth.token.highLevel == true ||
+            (auth.uid == data.child('authorId').val() && (
+              !newData.hasChild('exhibit') ||
+              newData.child('exhibit').val() == null ||
+              newData.child('exhibit').val() == data.child('exhibit').val()
+            ))
+          )
+        )",
+        "updates": {
+          ".write": "auth != null && (
+            auth.token.highLevel == true ||
+            auth.uid == root.child('posts').child($postId).child('authorId').val()
+          )"
+        }
+      },
+      ".indexOn": ["createdAt"]
+    },
+    "awareness": {
+      "$postId": {
+        "$clientId": {
+          ".read": "auth != null",
+          ".write": "auth != null && (
+            auth.token.highLevel == true ||
+            auth.uid == root.child('posts').child($postId).child('authorId').val()
+          )"
+        }
+      }
+    },
+    ".read": "auth != null",
+    ".write": "false"
+  }
+}
