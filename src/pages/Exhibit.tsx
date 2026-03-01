@@ -1,30 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button } from 'react-bootstrap';
-import { Trash } from 'react-bootstrap-icons';
 import { useAuth } from '../hooks/useAuth';
-import { useYjs } from '../hooks/useYjs';
-import { YjsRealtimeDatabaseProvider } from '../providers/YjsRealtimeDatabaseProvider';
+import { usePostEditor } from '../hooks/usePostEditor';
+import { subscribeToAllPosts } from '../hooks/postService';
+import { subscribeToArtifacts, deleteArtifact } from '../hooks/artifactService';
 import { parseGalleryContent } from '../utils/artifactUtils';
 import { deleteStorageFilesByUrls } from '../utils/imageUpload';
 import PostEditorModal from '../components/PostEditorModal';
 import PostViewModal from '../components/PostViewModal';
 import ArtifactEditorModal from '../components/ArtifactEditorModal';
-import MasonryGrid from '../components/MasonryGrid';
-import PostCard from '../components/PostCard';
-import Artifact, { type Artifact as ArtifactType } from '../components/Artifact';
+import CarouselEditorModal from '../components/CarouselEditorModal';
+import ParallaxExhibit, { type ExhibitConfig } from '../components/ParallaxExhibit';
+import { type Artifact as ArtifactType } from '../components/Artifact';
 import type { Post } from '../components/PostCard';
-
-// --- Types ---
-
-interface ExhibitConfig {
-    id: string;
-    exhibitNumber: number;
-    title: string;
-    subtitle: string;
-    backgroundImage: string;
-    quote?: string;
-    quoteAuthor?: string;
-}
 
 // --- Exhibit Definitions ---
 // Static exhibit data - posts with matching `exhibit` field in the database will appear under that exhibit
@@ -117,145 +104,6 @@ function getArtifactsForExhibit(artifacts: ArtifactType[], exhibit: ExhibitConfi
         .sort((a, b) => a.createdAt - b.createdAt);
 }
 
-// --- Components ---
-
-interface ParallaxExhibitProps {
-    exhibit: ExhibitConfig;
-    posts: Post[];
-    artifacts: ArtifactType[];
-    isAuthenticated: boolean;
-    isHighLevel: boolean;
-    onViewPost: (postId: string) => void;
-    onEditPost: (postId: string) => void;
-    onAddArtifact: (exhibitNumber: number) => void;
-    onDeleteArtifact: (artifact: ArtifactType) => void;
-}
-
-/**
- * The Parallax Exhibit Divider
- * Uses sticky positioning to create a "reveal" effect as you scroll past.
- */
-const ParallaxExhibit = ({
-    exhibit,
-    posts,
-    artifacts,
-    isAuthenticated: _isAuthenticated,
-    isHighLevel,
-    onViewPost,
-    onEditPost,
-    onAddArtifact,
-    onDeleteArtifact,
-}: ParallaxExhibitProps) => {
-    // Transform posts for masonry grid
-    const masonryItems = posts.map(post => ({
-        ...post,
-        contentLength: post.content.length,
-    }));
-
-    return (
-        <div className="parallax-chapter">
-            {/* THE PARALLAX HEADER */}
-            <div className="parallax-header">
-                <div className="parallax-dimmer" />
-                <img
-                    src={exhibit.backgroundImage}
-                    className="parallax-bg-image"
-                    alt={exhibit.title}
-                />
-                <div className="parallax-content">
-                    <div className="parallax-content-left">
-                        <h2 className="parallax-title">{exhibit.title}</h2>
-                        {exhibit.subtitle && (
-                            <p className="parallax-subtitle">{exhibit.subtitle}</p>
-                        )}
-                        {isHighLevel && (
-                            <Button
-                                variant="outline-light"
-                                size="sm"
-                                className="mt-3"
-                                onClick={() => onAddArtifact(exhibit.exhibitNumber)}
-                            >
-                                + Add Artifact
-                            </Button>
-                        )}
-                    </div>
-                    {exhibit.quote && (
-                        <div className="parallax-content-right">
-                            <div className="parallax-quote">
-                                <p className="parallax-quote-text">{exhibit.quote}</p>
-                                {exhibit.quoteAuthor && (
-                                    <p className="parallax-quote-author">{exhibit.quoteAuthor}</p>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* THE CONTENT */}
-            <div className="chapter-content">
-                {/* First artifact at the top if available */}
-                {artifacts[0] && (
-                    <div className="chapter-artifact-container chapter-artifact-wrapper">
-                        {isHighLevel && (
-                            <button
-                                type="button"
-                                className="artifact-delete-btn"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    onDeleteArtifact(artifacts[0]);
-                                }}
-                                aria-label="Delete artifact"
-                            >
-                                <Trash size={18} />
-                            </button>
-                        )}
-                        <Artifact artifact={artifacts[0]} />
-                    </div>
-                )}
-
-                {/* Regular posts in masonry layout */}
-                {posts.length > 0 && (
-                    <MasonryGrid
-                        items={masonryItems}
-                        className="chapter-masonry"
-                        renderItem={(post, ref) => (
-                            <PostCard
-                                post={post}
-                                onView={onViewPost}
-                                onEdit={onEditPost}
-                                cardRef={ref}
-                            />
-                        )}
-                    />
-                )}
-
-                {/* Remaining artifacts */}
-                {artifacts.slice(1).map(artifact => (
-                    <div key={artifact.id} className="chapter-artifact-container chapter-artifact-wrapper">
-                        {isHighLevel && (
-                            <button
-                                type="button"
-                                className="artifact-delete-btn"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    onDeleteArtifact(artifact);
-                                }}
-                                aria-label="Delete artifact"
-                            >
-                                <Trash size={18} />
-                            </button>
-                        )}
-                        <Artifact artifact={artifact} />
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-};
-
 // --- Main Component ---
 
 export default function Exhibit() {
@@ -266,25 +114,24 @@ export default function Exhibit() {
     const [viewPostId, setViewPostId] = useState<string | null>(null);
     // Artifact editor state (create only; no edit)
     const [artifactEditorExhibitId, setArtifactEditorExhibitId] = useState<number | null>(null);
+    // Carousel editor state
+    const [carouselEditorExhibitNumber, setCarouselEditorExhibitNumber] = useState<number | null>(null);
+    const [carouselReloadKey, setCarouselReloadKey] = useState(0);
 
-    // Use the Yjs hook for collaborative editing
-    const { editor, isReady, deletePost, isEmpty } = useYjs({
+    const { editor, isReady, isDirty, isSaving, save, deletePost, isEmpty } = usePostEditor({
         postId: activePostId,
         userId: currentUser?.uid ?? null,
-        userName: currentUser?.email ?? null,
     });
 
-    // Fetch posts from Firebase Realtime Database
     useEffect(() => {
-        const unsubscribe = YjsRealtimeDatabaseProvider.subscribeToPosts((postsArray) => {
+        const unsubscribe = subscribeToAllPosts((postsArray) => {
             setPosts(postsArray);
         });
         return unsubscribe;
     }, []);
 
-    // Fetch artifacts from Firebase Realtime Database
     useEffect(() => {
-        const unsubscribe = YjsRealtimeDatabaseProvider.subscribeToArtifacts((artifactsArray) => {
+        const unsubscribe = subscribeToArtifacts((artifactsArray) => {
             setArtifacts(artifactsArray);
         });
         return unsubscribe;
@@ -328,6 +175,18 @@ export default function Exhibit() {
         setArtifactEditorExhibitId(null);
     };
 
+    const handleEditCarousel = (exhibitNumber: number) => {
+        setCarouselEditorExhibitNumber(exhibitNumber);
+    };
+
+    const handleCarouselSaved = () => {
+        setCarouselReloadKey(k => k + 1);
+    };
+
+    const handleCloseCarouselEditor = () => {
+        setCarouselEditorExhibitNumber(null);
+    };
+
     const handleDeleteArtifact = async (artifact: ArtifactType) => {
         if (!window.confirm('Delete this artifact? This cannot be undone.')) return;
         try {
@@ -338,7 +197,7 @@ export default function Exhibit() {
                     await deleteStorageFilesByUrls(urls);
                 }
             }
-            await YjsRealtimeDatabaseProvider.deleteArtifact(artifact.id);
+            await deleteArtifact(artifact.id);
         } catch (error) {
             console.error('Failed to delete artifact:', error);
         }
@@ -388,10 +247,12 @@ export default function Exhibit() {
                     artifacts={exhibitArtifacts}
                     isAuthenticated={!!currentUser}
                     isHighLevel={isHighLevel}
+                    reloadKey={carouselReloadKey}
                     onViewPost={handleViewPost}
                     onEditPost={handleEditPost}
                     onAddArtifact={handleAddArtifact}
                     onDeleteArtifact={handleDeleteArtifact}
+                    onEditCarousel={handleEditCarousel}
                 />
             ))}
 
@@ -416,6 +277,9 @@ export default function Exhibit() {
                 activePost={activePost || null}
                 editor={editor}
                 isReady={isReady}
+                isDirty={isDirty}
+                isSaving={isSaving}
+                onSave={save}
                 onClose={handleCloseEditor}
             />
 
@@ -433,6 +297,15 @@ export default function Exhibit() {
                 onClose={handleCloseArtifactEditor}
             />
 
+            {/* Carousel Editor Modal */}
+            {carouselEditorExhibitNumber !== null && (
+                <CarouselEditorModal
+                    show
+                    exhibitNumber={carouselEditorExhibitNumber}
+                    onClose={handleCloseCarouselEditor}
+                    onSaved={handleCarouselSaved}
+                />
+            )}
         </div>
     );
 }

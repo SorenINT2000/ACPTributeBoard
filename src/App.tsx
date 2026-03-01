@@ -2,7 +2,6 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/Layout';
-import Home from './pages/Home';
 import Feed from './pages/Feed';
 import Exhibit from './pages/Exhibit';
 import Login from './pages/Login';
@@ -18,7 +17,7 @@ const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <Home />,
+                element: <Feed />,
             },
             {
                 path: 'login',
@@ -30,11 +29,7 @@ const router = createBrowserRouter([
             },
             {
                 path: 'feed',
-                element: (
-                    <ProtectedRoute>
-                        <Feed />
-                    </ProtectedRoute>
-                ),
+                element: <Feed />,
             },
             {
                 path: 'exhibit',

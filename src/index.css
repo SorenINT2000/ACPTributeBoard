@@ -341,32 +341,6 @@ main {
     }
 }
 
-/* Collaboration Cursors */
-.collaboration-carets__caret {
-    border-left: 1px solid #0d0d0d;
-    border-right: 1px solid #0d0d0d;
-    margin-left: -1px;
-    margin-right: -1px;
-    pointer-events: none;
-    position: relative;
-    word-break: normal;
-}
-
-.collaboration-carets__label {
-    border-radius: 3px 3px 3px 0;
-    color: #fafafa;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 600;
-    left: -1px;
-    line-height: normal;
-    padding: 0.1rem 0.3rem;
-    position: absolute;
-    top: -1.4em;
-    user-select: none;
-    white-space: nowrap;
-}
-
 /* Editor Container */
 .tiptap-editor-container {
     border: 1px solid var(--color-border);
@@ -737,6 +711,27 @@ main {
 }
 
 .parallax-bg-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 25%;
+}
+
+.parallax-carousel {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.parallax-carousel .carousel-inner,
+.parallax-carousel .carousel-item {
+    height: 100%;
+}
+
+.parallax-carousel .carousel-item img {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -1522,14 +1517,14 @@ main {
 
 /* Video variant: video is the modal (direct child of backdrop, no card wrapper) */
 .artifact-modal-video-content {
-    width: min(1000px, calc(100vw - 4rem), calc((100vh - 4rem) * 16 / 9));
-    aspect-ratio: 16 / 9;
+    --video-ratio: 1.7778;
+    width: min(1000px, calc(100vw - 4rem), calc((100vh - 4rem) * var(--video-ratio)));
+    aspect-ratio: var(--video-ratio);
 }
 
 .artifact-modal-video-content iframe {
     width: 100%;
     height: 100%;
-    aspect-ratio: 16 / 9;
     border-radius: 8px;
     border: none;
 }
@@ -1806,4 +1801,80 @@ main {
     color: rgba(255, 255, 255, 0.8);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+}
+
+/* ============================================================
+   Carousel Editor
+   ============================================================ */
+
+.carousel-edit-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 30;
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+    color: #333;
+    line-height: 1;
+    transition: background 0.2s, color 0.2s;
+}
+
+.carousel-edit-btn:hover {
+    background: rgba(255, 255, 255, 0.95);
+    color: #000;
+}
+
+.carousel-editor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.carousel-editor-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background 0.15s;
+    cursor: default;
+}
+
+.carousel-editor-item:hover {
+    background: var(--bs-gray-100, #f8f9fa);
+}
+
+.carousel-editor-number {
+    font-weight: 600;
+    min-width: 24px;
+    text-align: right;
+    color: var(--bs-gray-500, #adb5bd);
+    font-size: 0.85rem;
+}
+
+.carousel-editor-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.9rem;
+    font-family: var(--bs-font-monospace, monospace);
+}
+
+.carousel-editor-popover-img {
+    max-width: 200px;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+}
+
+.file-drop-zone {
+    border-color: var(--bs-gray-400, #ced4da) !important;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.file-drop-zone:hover {
+    border-color: var(--bs-primary, #0d6efd) !important;
 }

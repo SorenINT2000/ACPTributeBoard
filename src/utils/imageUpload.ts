@@ -1,5 +1,6 @@
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from '../firebaseConfig';
+import { convertToWebP } from './convertToWebP';
 
 /**
  * Extract storage path from a Firebase Storage download URL.
@@ -50,22 +51,18 @@ export async function deleteStorageFilesByUrls(urls: string[]): Promise<void> {
  * @param postId - The ID of the post this image belongs to
  * @returns The download URL of the uploaded image
  */
-export async function uploadImageToStorage(file: File, postId: string): Promise<string> {
-    // Generate a unique filename using timestamp and random string
+export async function uploadPostImageToStorage(file: File, postId: string): Promise<string> {
+    const converted = await convertToWebP(file);
     const timestamp = Date.now();
     const randomStr = Math.random().toString(36).substring(2, 8);
-    const extension = file.name.split('.').pop() || 'png';
+    const extension = converted.name.split('.').pop() || 'webp';
     const filename = `${timestamp}-${randomStr}.${extension}`;
-    
-    // Create a reference to the storage location
+
     const imageRef = ref(storage, `post-images/${postId}/${filename}`);
-    
-    // Upload the file
-    const snapshot = await uploadBytes(imageRef, file, {
-        contentType: file.type,
+    const snapshot = await uploadBytes(imageRef, converted, {
+        contentType: converted.type,
     });
-    
-    // Get and return the download URL
+
     const downloadURL = await getDownloadURL(snapshot.ref);
     return downloadURL;
 }
@@ -77,16 +74,17 @@ export async function uploadImageToStorage(file: File, postId: string): Promise<
  * @returns The public download URL of the uploaded file (no token required since artifacts are public)
  */
 export async function uploadArtifactFile(file: File, exhibitId: number): Promise<string> {
+    const converted = await convertToWebP(file);
     const timestamp = Date.now();
     const randomStr = Math.random().toString(36).substring(2, 8);
-    const extension = file.name.split('.').pop() || 'bin';
+    const extension = converted.name.split('.').pop() || 'bin';
     const filename = `${timestamp}-${randomStr}.${extension}`;
-    
+
     const storagePath = `artifacts/exhibit-${exhibitId}/${filename}`;
     const fileRef = ref(storage, storagePath);
-    
-    await uploadBytes(fileRef, file, {
-        contentType: file.type,
+
+    await uploadBytes(fileRef, converted, {
+        contentType: converted.type,
     });
     
     // Return public URL (without token) since artifacts have public read access

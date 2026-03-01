@@ -1,4 +1,4 @@
-import { Modal, Spinner } from 'react-bootstrap';
+import { Modal, Button, Spinner } from 'react-bootstrap';
 import { EditorContent } from '@tiptap/react';
 import type { Editor } from '@tiptap/react';
 import type { Post } from './PostCard';
@@ -9,13 +9,23 @@ interface PostEditorModalProps {
     activePost: Post | null;
     editor: Editor | null;
     isReady: boolean;
+    isDirty?: boolean;
+    isSaving?: boolean;
+    onSave?: () => void;
     onClose: () => void;
     onUploadImage?: (file: File) => Promise<void>;
 }
 
-function PostEditorModal({ show, activePost, editor, isReady, onClose, onUploadImage }: PostEditorModalProps) {
+function PostEditorModal({ show, activePost, editor, isReady, isDirty, isSaving, onSave, onClose, onUploadImage }: PostEditorModalProps) {
+    const handleClose = () => {
+        if (isDirty && onSave) {
+            onSave();
+        }
+        onClose();
+    };
+
     return (
-        <Modal show={show} onHide={onClose} size="lg">
+        <Modal show={show} onHide={handleClose} size="lg">
             <Modal.Header closeButton>
                 <Modal.Title>
                     {activePost ? 'Edit Recognition Post' : 'Create Recognition Post'}
@@ -37,6 +47,25 @@ function PostEditorModal({ show, activePost, editor, isReady, onClose, onUploadI
                     </div>
                 )}
             </Modal.Body>
+            {isReady && onSave && (
+                <Modal.Footer>
+                    <span className="text-muted me-auto" style={{ fontSize: '0.8rem' }}>
+                        {isSaving ? 'Saving...' : isDirty ? 'Unsaved changes' : 'Saved'}
+                    </span>
+                    <Button
+                        variant="primary"
+                        onClick={onSave}
+                        disabled={!isDirty || isSaving}
+                    >
+                        {isSaving ? (
+                            <>
+                                <Spinner animation="border" size="sm" className="me-1" />
+                                Saving
+                            </>
+                        ) : 'Save'}
+                    </Button>
+                </Modal.Footer>
+            )}
         </Modal>
     );
 }
