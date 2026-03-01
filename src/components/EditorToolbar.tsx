@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { ButtonGroup, Button, Dropdown } from 'react-bootstrap';
+import { useEditorState } from '@tiptap/react';
 import type { Editor } from '@tiptap/react';
 import {
     TypeBold,
@@ -91,15 +92,39 @@ interface EditorToolbarProps {
 function EditorToolbar({ editor, onUploadImage }: EditorToolbarProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    if (!editor) return null;
+    const editorState = useEditorState({
+        editor,
+        selector: ({ editor: e }) => {
+            if (!e) return null;
+            return {
+                isBold: e.isActive('bold'),
+                isItalic: e.isActive('italic'),
+                isUnderline: e.isActive('underline'),
+                isStrike: e.isActive('strike'),
+                isParagraph: e.isActive('paragraph') && !e.isActive('heading'),
+                heading1: e.isActive('heading', { level: 1 }),
+                heading2: e.isActive('heading', { level: 2 }),
+                heading3: e.isActive('heading', { level: 3 }),
+                alignLeft: e.isActive({ textAlign: 'left' }),
+                alignCenter: e.isActive({ textAlign: 'center' }),
+                alignRight: e.isActive({ textAlign: 'right' }),
+                isBulletList: e.isActive('bulletList'),
+                isOrderedList: e.isActive('orderedList'),
+                isBlockquote: e.isActive('blockquote'),
+                isCodeBlock: e.isActive('codeBlock'),
+            };
+        },
+    });
+
+    if (!editor || !editorState) return null;
 
     const headingOptions = [
-        { level: 1, label: 'Heading 1' },
-        { level: 2, label: 'Heading 2' },
-        { level: 3, label: 'Heading 3' },
+        { level: 1, label: 'Heading 1', active: editorState.heading1 },
+        { level: 2, label: 'Heading 2', active: editorState.heading2 },
+        { level: 3, label: 'Heading 3', active: editorState.heading3 },
     ] as const;
 
-    const currentHeading = headingOptions.find(h => editor.isActive('heading', { level: h.level }));
+    const currentHeading = headingOptions.find(h => h.active);
 
     const handleUploadClick = () => {
         fileInputRef.current?.click();
@@ -140,16 +165,16 @@ function EditorToolbar({ editor, onUploadImage }: EditorToolbarProps) {
                     <Dropdown.Menu>
                         <Dropdown.Item
                             onClick={() => editor.chain().focus().setParagraph().run()}
-                            active={editor.isActive('paragraph') && !editor.isActive('heading')}
+                            active={editorState.isParagraph}
                         >
                             Paragraph
                         </Dropdown.Item>
                         <Dropdown.Divider />
-                        {headingOptions.map(({ level, label }) => (
+                        {headingOptions.map(({ level, label, active }) => (
                             <Dropdown.Item
                                 key={level}
                                 onClick={() => editor.chain().focus().toggleHeading({ level }).run()}
-                                active={editor.isActive('heading', { level })}
+                                active={active}
                             >
                                 {label}
                             </Dropdown.Item>
@@ -161,28 +186,28 @@ function EditorToolbar({ editor, onUploadImage }: EditorToolbarProps) {
             {/* Text Formatting Group */}
             <ButtonGroup size="sm" className="me-2">
                 <Button
-                    variant={editor.isActive('bold') ? 'secondary' : 'outline-secondary'}
+                    variant={editorState.isBold ? 'secondary' : 'outline-secondary'}
                     onClick={() => editor.chain().focus().toggleBold().run()}
                     title="Bold (Ctrl+B)"
                 >
                     <TypeBold />
                 </Button>
                 <Button
-                    variant={editor.isActive('italic') ? 'secondary' : 'outline-secondary'}
+                    variant={editorState.isItalic ? 'secondary' : 'outline-secondary'}
                     onClick={() => editor.chain().focus().toggleItalic().run()}
                     title="Italic (Ctrl+I)"
                 >
                     <TypeItalic />
                 </Button>
                 <Button
-                    variant={editor.isActive('underline') ? 'secondary' : 'outline-secondary'}
+                    variant={editorState.isUnderline ? 'secondary' : 'outline-secondary'}
                     onClick={() => editor.chain().focus().toggleUnderline().run()}
                     title="Underline (Ctrl+U)"
                 >
                     <TypeUnderline />
                 </Button>
                 <Button
-                    variant={editor.isActive('strike') ? 'secondary' : 'outline-secondary'}
+                    variant={editorState.isStrike ? 'secondary' : 'outline-secondary'}
                     onClick={() => editor.chain().focus().toggleStrike().run()}
                     title="Strikethrough"
                 >
@@ -193,21 +218,21 @@ function EditorToolbar({ editor, onUploadImage }: EditorToolbarProps) {
             {/* Alignment Group */}
             <ButtonGroup size="sm" className="me-2">
                 <Button
-                    variant={editor.isActive({ textAlign: 'left' }) ? 'secondary' : 'outline-secondary'}
+                    variant={editorState.alignLeft ? 'secondary' : 'outline-secondary'}
                     onClick={() => editor.chain().focus().setTextAlign('left').run()}
                     title="Align Left"
                 >
                     <TextLeft />
                 </Button>
                 <Button
-                    variant={editor.isActive({ textAlign: 'center' }) ? 'secondary' : 'outline-secondary'}
+                    variant={editorState.alignCenter ? 'secondary' : 'outline-secondary'}
                     onClick={() => editor.chain().focus().setTextAlign('center').run()}
                     title="Align Center"
                 >
                     <TextCenter />
                 </Button>
                 <Button
-                    variant={editor.isActive({ textAlign: 'right' }) ? 'secondary' : 'outline-secondary'}
+                    variant={editorState.alignRight ? 'secondary' : 'outline-secondary'}
                     onClick={() => editor.chain().focus().setTextAlign('right').run()}
                     title="Align Right"
                 >
@@ -218,14 +243,14 @@ function EditorToolbar({ editor, onUploadImage }: EditorToolbarProps) {
             {/* Lists Group */}
             <ButtonGroup size="sm" className="me-2">
                 <Button
-                    variant={editor.isActive('bulletList') ? 'secondary' : 'outline-secondary'}
+                    variant={editorState.isBulletList ? 'secondary' : 'outline-secondary'}
                     onClick={() => editor.chain().focus().toggleBulletList().run()}
                     title="Bullet List"
                 >
                     <ListUl />
                 </Button>
                 <Button
-                    variant={editor.isActive('orderedList') ? 'secondary' : 'outline-secondary'}
+                    variant={editorState.isOrderedList ? 'secondary' : 'outline-secondary'}
                     onClick={() => editor.chain().focus().toggleOrderedList().run()}
                     title="Numbered List"
                 >
@@ -236,14 +261,14 @@ function EditorToolbar({ editor, onUploadImage }: EditorToolbarProps) {
             {/* Block Elements Group */}
             <ButtonGroup size="sm" className="me-2">
                 <Button
-                    variant={editor.isActive('blockquote') ? 'secondary' : 'outline-secondary'}
+                    variant={editorState.isBlockquote ? 'secondary' : 'outline-secondary'}
                     onClick={() => editor.chain().focus().toggleBlockquote().run()}
                     title="Quote"
                 >
                     <Quote />
                 </Button>
                 <Button
-                    variant={editor.isActive('codeBlock') ? 'secondary' : 'outline-secondary'}
+                    variant={editorState.isCodeBlock ? 'secondary' : 'outline-secondary'}
                     onClick={() => editor.chain().focus().toggleCodeBlock().run()}
                     title="Code Block"
                 >

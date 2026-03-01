@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { Card, Button, Form } from 'react-bootstrap';
 import { Pencil } from 'react-bootstrap-icons';
 import { useAuth } from '../hooks/useAuth';
-import { YjsRealtimeDatabaseProvider } from '../providers/YjsRealtimeDatabaseProvider';
+import { updatePostExhibit } from '../hooks/postService';
 
 interface Post {
     id: string;
@@ -124,7 +124,7 @@ function PostCard({ post, onEdit, onView, cardRef }: PostCardProps) {
         e.stopPropagation(); // Prevent card click from firing
         const value = e.target.value;
         const exhibitNumber = value === '' ? null : parseInt(value, 10);
-        YjsRealtimeDatabaseProvider.updatePostExhibit(post.id, exhibitNumber)
+        updatePostExhibit(post.id, exhibitNumber)
             .catch((error) => {
                 console.error('Failed to update exhibit:', error);
             });

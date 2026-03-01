@@ -12,6 +12,13 @@ service firebase.storage {
         && request.auth.token.highLevel == true;
     }
     
+    // Website images - public read for site assets (hero image, etc.)
+    match /website-images/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.token.highLevel == true;
+    }
+    
     // Artifact files - authenticated users can upload, high-level can delete
     match /artifacts/{exhibitFolder}/{fileId} {
       allow read: if true;

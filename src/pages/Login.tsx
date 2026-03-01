@@ -122,7 +122,7 @@ function Login() {
             <Card className="mx-auto" style={{ maxWidth: '400px' }}>
                 <Card.Body>
                     <Card.Title>Sign In</Card.Title>
-                    <Card.Text>Please sign in to access the ACP Tribute Board</Card.Text>
+                    <Card.Text>Please sign in to create posts on the tribute board</Card.Text>
                     <div className="d-grid mb-3">
                         <Button
                             variant="outline-secondary"

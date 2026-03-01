@@ -106,7 +106,7 @@ function Signup() {
             <Card className="mx-auto" style={{ maxWidth: '400px' }}>
                 <Card.Body>
                     <Card.Title>Sign Up</Card.Title>
-                    <Card.Text>Create an account to join the ACP Tribute Board</Card.Text>
+                    <Card.Text>Create an account to create posts on the tribute board</Card.Text>
                     <div className="d-grid mb-3">
                         <Button
                             variant="outline-secondary"

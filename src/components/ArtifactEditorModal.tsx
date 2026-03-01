@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Modal, Form, Button, Spinner } from 'react-bootstrap';
-import { YjsRealtimeDatabaseProvider } from '../providers/YjsRealtimeDatabaseProvider';
+import { createArtifact, updateArtifact, deleteArtifact } from '../hooks/artifactService';
 import { parseGalleryContent, extractAllImages } from '../utils/artifactUtils';
 import { ArtifactGalleryEditor } from './ArtifactGallery';
 import { ArtifactSlideshowEditor } from './ArtifactSlideshow';
@@ -28,7 +28,7 @@ const ARTIFACT_TYPES: Array<{ value: Artifact['type']; label: string; descriptio
  */
 function extractYouTubeVideoId(url: string): string | null {
     const patterns = [
-        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+        /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
         /^([a-zA-Z0-9_-]{11})$/,
     ];
     for (const pattern of patterns) {
@@ -134,6 +134,7 @@ function ArtifactEditorModal({ show, exhibitId, artifact, onClose, onSaved }: Ar
         e.preventDefault();
         if (!exhibitId) return;
         if (type === 'gallery' && galleryImages.length === 0) return;
+        if (type !== 'gallery' && !content) return;
 
         setSaving(true);
         try {
@@ -159,11 +160,9 @@ function ArtifactEditorModal({ show, exhibitId, artifact, onClose, onSaved }: Ar
             }
 
             if (isEditing && artifact) {
-                // Update existing artifact
-                await YjsRealtimeDatabaseProvider.updateArtifact(artifact.id, artifactData);
+                await updateArtifact(artifact.id, artifactData);
             } else {
-                // Create new artifact
-                await YjsRealtimeDatabaseProvider.createArtifact(artifactData);
+                await createArtifact(artifactData);
             }
             onSaved?.();
             onClose();
@@ -179,7 +178,7 @@ function ArtifactEditorModal({ show, exhibitId, artifact, onClose, onSaved }: Ar
 
         setDeleting(true);
         try {
-            await YjsRealtimeDatabaseProvider.deleteArtifact(artifact.id);
+            await deleteArtifact(artifact.id);
             onSaved?.();
             onClose();
         } catch (error) {

@@ -61,7 +61,7 @@ function Navbar() {
             <Container>
                 <BootstrapNavbar.Toggle aria-controls="main-navbar-nav" className="order-0" />
                 <BootstrapNavbar.Brand as={Link} to="/" className="order-1">
-                    ACP Tribute Board
+                    Dr. Moyer's Tribute Board
                 </BootstrapNavbar.Brand>
 
                 {/* Always-visible controls beside the brand (mobile + desktop) */}
@@ -80,10 +80,9 @@ function Navbar() {
 
                 <BootstrapNavbar.Collapse id="main-navbar-nav" className="order-3 order-lg-2">
                     <Nav className="me-auto">
-                        <Nav.Link as={Link} to="/" onClick={closeDrawer}>Home</Nav.Link>
+                        <Nav.Link as={Link} to="/" onClick={closeDrawer}>Feed</Nav.Link>
                         {currentUser && (
                             <>
-                                <Nav.Link as={Link} to="/feed" onClick={closeDrawer}>Feed</Nav.Link>
                                 <Nav.Link as={Link} to="/exhibit" onClick={closeDrawer}>Exhibit</Nav.Link>
                                 {isHighLevel && (
                                     <Nav.Link as={Link} to="/admin" onClick={closeDrawer}>Admin</Nav.Link>
