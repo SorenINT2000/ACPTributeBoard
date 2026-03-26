@@ -200,6 +200,7 @@ export function usePostEditor({
 
     useEffect(() => { saveRef.current = save; }, [save]);
 
+    // Clear editor content when postId becomes null
     useEffect(() => {
         if (!postId && editor && !editor.isDestroyed) {
             isSettingContentRef.current = true;

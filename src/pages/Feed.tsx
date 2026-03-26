@@ -244,8 +244,9 @@ function Feed() {
             prev.map(p => {
                 if (p.id !== postId) return p;
                 if (exhibit === undefined) {
-                    const { exhibit: _drop, ...rest } = p;
-                    return rest as Post;
+                    const next = { ...p };
+                    delete next.exhibit;
+                    return next;
                 }
                 return { ...p, exhibit };
             }),
