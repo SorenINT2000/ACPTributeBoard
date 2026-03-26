@@ -5,7 +5,12 @@ import { ref, getDownloadURL } from 'firebase/storage';
 import { storage } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
 import { usePostEditor } from '../hooks/usePostEditor';
-import { createPost, getPostsPaginated, getMorePosts, subscribeToNewestPost } from '../hooks/postService';
+import {
+    getPostsPaginated,
+    getMorePosts,
+    subscribeToNewestPost,
+    deletePost as deletePostDocument,
+} from '../hooks/postService';
 import { getDisplayName } from '../utils/userProfile';
 import type { Post } from '../components/PostCard';
 import PostCard from '../components/PostCard';
@@ -19,8 +24,10 @@ const LOAD_MORE_BATCH = 5;
 function Feed() {
     const { currentUser, userProfile } = useAuth();
     const [activePostId, setActivePostId] = useState<string | null>(null);
+    const [isUnsavedDraft, setIsUnsavedDraft] = useState(false);
     const [viewPostId, setViewPostId] = useState<string | null>(null);
     const [pfpUrl, setPfpUrl] = useState<string | null>(null);
+    const [pfpImageLoaded, setPfpImageLoaded] = useState(false);
 
     const displayName = getDisplayName(userProfile);
 
@@ -30,20 +37,21 @@ function Feed() {
             .catch((err) => console.error('Failed to load moyer.jpg:', err));
     }, []);
 
-    const { editor, isReady, isDirty, isSaving, save, deletePost, isEmpty, uploadImage } = usePostEditor({
-        postId: activePostId,
-        userId: currentUser?.uid ?? null,
-    });
+    useEffect(() => {
+        setPfpImageLoaded(false);
+    }, [pfpUrl]);
 
     // --- Post feed state ---
     const [posts, setPosts] = useState<Post[]>([]);
     const [loadingState, setLoadingState] = useState<'loading-initial' | 'loading-more' | 'idle' | 'error'>('loading-initial');
     const [hasMore, setHasMore] = useState(true);
     const [error, setError] = useState<Error | null>(null);
-    const [hasNewPosts, setHasNewPosts] = useState(false);
+    /** True when Firestore's newest post id no longer matches ours (new post, deleted top post, etc.) */
+    const [feedRefreshSuggested, setFeedRefreshSuggested] = useState(false);
     const newestKnownPostIdRef = useRef<string | null>(null);
     const oldestCreatedAtRef = useRef<number | null>(null);
     const isLoadingMoreRef = useRef(false);
+    const refreshFeedHeadRef = useRef<() => Promise<void>>(async () => {});
 
     // Initial fetch
     useEffect(() => {
@@ -66,18 +74,18 @@ function Feed() {
             });
     }, []);
 
-    // New-posts banner listener
+    // When the newest document in Firestore changes, our paginated view may be stale (new post or top post removed)
     useEffect(() => {
         const unsubscribe = subscribeToNewestPost(post => {
             if (!post) return;
             if (newestKnownPostIdRef.current === null) return;
             if (newestKnownPostIdRef.current === post.id) return;
-            setHasNewPosts(true);
+            setFeedRefreshSuggested(true);
         });
         return unsubscribe;
     }, []);
 
-    const loadNewPosts = useCallback(async () => {
+    const refreshFeedHead = useCallback(async () => {
         try {
             const fresh = await getPostsPaginated(INITIAL_BATCH + 1);
             const hasMorePosts = fresh.length > INITIAL_BATCH;
@@ -100,11 +108,34 @@ function Feed() {
             }
 
             setHasMore(prev => prev || hasMorePosts);
-            setHasNewPosts(false);
+            setFeedRefreshSuggested(false);
         } catch (err) {
-            console.error('Failed to load new posts:', err);
+            console.error('Failed to refresh feed:', err);
         }
     }, []);
+
+    useEffect(() => {
+        refreshFeedHeadRef.current = refreshFeedHead;
+    }, [refreshFeedHead]);
+
+    const handleDraftSaved = useCallback(() => {
+        setIsUnsavedDraft(false);
+        void refreshFeedHeadRef.current();
+    }, []);
+
+    const { editor, isReady, isDirty, isSaving, save, isEmpty, uploadImage } = usePostEditor({
+        postId: activePostId,
+        userId: currentUser?.uid ?? null,
+        isUnsavedDraft,
+        draftAuthor:
+            isUnsavedDraft && currentUser
+                ? {
+                    email: currentUser.email,
+                    authorName: displayName !== 'Anonymous' ? displayName : undefined,
+                }
+                : null,
+        onDraftSaved: handleDraftSaved,
+    });
 
     const loadMorePosts = useCallback(async () => {
         if (isLoadingMoreRef.current || !hasMore || oldestCreatedAtRef.current === null) return;
@@ -166,31 +197,60 @@ function Feed() {
     const handleCreateNew = () => {
         if (!currentUser) return;
         const newPostId = `post_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-        createPost(
-            newPostId,
-            currentUser.uid,
-            currentUser.email,
-            displayName !== 'Anonymous' ? displayName : undefined
-        ).then(() => {
-            setActivePostId(newPostId);
-        }).catch((error) => {
-            console.error('Error creating post:', error);
-        });
+        setIsUnsavedDraft(true);
+        setActivePostId(newPostId);
     };
 
-    const handleEditPost = (postId: string) => setActivePostId(postId);
+    const handleEditPost = (postId: string) => {
+        setIsUnsavedDraft(false);
+        setActivePostId(postId);
+    };
     const handleViewPost = (postId: string) => setViewPostId(postId);
 
-    const handleCloseEditor = () => {
-        if (activePostId && isEmpty()) {
-            deletePost().catch((error) => {
-                console.error('Error deleting empty post:', error);
+    const handleDeletePost = useCallback(async (postId: string) => {
+        try {
+            await deletePostDocument(postId);
+            setPosts(prev => {
+                const next = prev.filter(p => p.id !== postId);
+                if (newestKnownPostIdRef.current === postId) {
+                    newestKnownPostIdRef.current = next.length > 0 ? next[0].id : null;
+                }
+                return next;
             });
+            let closedEditor = false;
+            setActivePostId(current => {
+                if (current === postId) {
+                    closedEditor = true;
+                    return null;
+                }
+                return current;
+            });
+            if (closedEditor) setIsUnsavedDraft(false);
+            setViewPostId(current => (current === postId ? null : current));
+        } catch (err) {
+            console.error('Failed to delete post:', err);
         }
+    }, []);
+
+    const handleCloseEditor = () => {
         setActivePostId(null);
+        setIsUnsavedDraft(false);
     };
 
     const handleCloseView = () => setViewPostId(null);
+
+    const handleExhibitUpdated = useCallback((postId: string, exhibit: number | undefined) => {
+        setPosts(prev =>
+            prev.map(p => {
+                if (p.id !== postId) return p;
+                if (exhibit === undefined) {
+                    const { exhibit: _drop, ...rest } = p;
+                    return rest as Post;
+                }
+                return { ...p, exhibit };
+            }),
+        );
+    }, []);
 
     const activePost = activePostId ? posts.find(p => p.id === activePostId) : null;
     const viewPost = viewPostId ? posts.find(p => p.id === viewPostId) : null;
@@ -228,28 +288,75 @@ function Feed() {
         <Container className="mt-4">
             <Card className="text-center mb-4">
                 <Card.Body>
-                    <div className="mb-3">
-                        {pfpUrl ? (
-                            <img
-                                src={pfpUrl}
-                                alt="Soren"
-                                style={{
-                                    width: 150,
-                                    height: 150,
-                                    borderRadius: '50%',
-                                    objectFit: 'cover',
-                                }}
-                            />
-                        ) : (
-                            <Spinner animation="border" variant="secondary" />
-                        )}
+                    <div
+                        className="mb-3 d-flex justify-content-center"
+                        aria-busy={!pfpUrl || !pfpImageLoaded}
+                    >
+                        {/*
+                          Show the skeleton until the image fires onLoad. If we only swap skeleton -> img when
+                          pfpUrl is set, browsers often paint alt text for a moment before decode/display.
+                        */}
+                        <div
+                            className="position-relative rounded-circle overflow-hidden bg-secondary bg-opacity-10"
+                            style={{ width: 150, height: 150 }}
+                        >
+                            {pfpUrl ? (
+                                <img
+                                    src={pfpUrl}
+                                    alt="Dr. Moyer"
+                                    width={150}
+                                    height={150}
+                                    onLoad={() => setPfpImageLoaded(true)}
+                                    onError={() => setPfpImageLoaded(true)}
+                                    className="position-relative d-block w-100 h-100 rounded-circle"
+                                    style={{
+                                        objectFit: 'cover',
+                                        opacity: pfpImageLoaded ? 1 : 0,
+                                    }}
+                                />
+                            ) : null}
+                            {(!pfpUrl || !pfpImageLoaded) && (
+                                <div
+                                    className="placeholder placeholder-glow position-absolute top-0 start-0 w-100 h-100 rounded-circle m-0 border-0 bg-secondary"
+                                    style={{ zIndex: 1 }}
+                                    aria-hidden
+                                />
+                            )}
+                        </div>
                     </div>
                     <Card.Title as="h1">Dr. Moyer's Tribute Board</Card.Title>
                     <Card.Text>Welcome to the interactive tribute and recognition board!</Card.Text>
                     {currentUser ? (
-                        <Button variant="primary" onClick={handleCreateNew}>
-                            Create a Post
-                        </Button>
+                        <>
+                            <div
+                                className="feed-member-guide text-start mx-auto mb-4 p-3 rounded bg-body-secondary bg-opacity-25"
+                                style={{ maxWidth: '36rem' }}
+                            >
+                                <h2 className="h6 mb-3 text-center">How to use this board</h2>
+                                <ol className="small mb-0 ps-3">
+                                    <li className="mb-2">
+                                        Click <strong>Create a Post</strong> to compose a recognition post.
+                                    </li>
+                                    <li className="mb-2">
+                                        Write your message with the toolbar: bold, lists, alignment, emojis, and{' '}
+                                        images.
+                                    </li>
+                                    <li className="mb-2">
+                                        After you save, your post shows up here for everyone. Use the{' '}
+                                        <strong>pencil</strong> on your card to edit, or the <strong>trash</strong>{' '}
+                                        icon to delete your post.
+                                    </li>
+                                    <li className="mb-2">
+                                        Posts may be assigned to <strong>Exhibits</strong> by staff. You'll see which exhibit
+                                        (if any) your post is part of on your card. Visit the{' '}
+                                        <Link to="/exhibit">Exhibit</Link> page in the menu for the full curated tribute!
+                                    </li>
+                                </ol>
+                            </div>
+                            <Button variant="primary" onClick={handleCreateNew}>
+                                Create a Post
+                            </Button>
+                        </>
                     ) : (
                         <div>
                             <Card.Text>Sign in to create a recognition post</Card.Text>
@@ -261,15 +368,20 @@ function Feed() {
                                     <Button variant="outline-primary">Sign Up</Button>
                                 </Link>
                             </div>
+                            <p className="text-muted small text-start mx-auto mt-4 mb-0" style={{ maxWidth: '36rem' }}>
+                                You can read every post here without an account. Create a free account or sign in to
+                                write your own recognition message. After you sign in, use the <strong>Exhibit</strong>{' '}
+                                link in the menu for the full curated tribute walkthrough.
+                            </p>
                         </div>
                     )}
                 </Card.Body>
             </Card>
 
-            {hasNewPosts && (
+            {feedRefreshSuggested && (
                 <div className="text-center mb-3">
-                    <Button variant="outline-primary" size="sm" onClick={loadNewPosts}>
-                        New posts available — tap to refresh
+                    <Button variant="outline-primary" size="sm" onClick={refreshFeedHead}>
+                        Feed may have changed — tap to refresh
                     </Button>
                 </div>
             )}
@@ -302,6 +414,8 @@ function Feed() {
                                     post={post}
                                     onEdit={handleEditPost}
                                     onView={handleViewPost}
+                                    onDelete={handleDeletePost}
+                                    onExhibitUpdated={handleExhibitUpdated}
                                     cardRef={masonryRef}
                                 />
                             </div>
@@ -334,6 +448,7 @@ function Feed() {
                 onSave={save}
                 onClose={handleCloseEditor}
                 onUploadImage={uploadImage}
+                saveDisabled={isSaving || !isDirty || (isUnsavedDraft && isEmpty())}
             />
 
             <PostViewModal

@@ -25,14 +25,16 @@ export function createPost(
     authorId: string,
     authorEmail: string | null,
     authorName?: string,
+    content = '',
 ): Promise<void> {
+    const now = Date.now();
     return setDoc(doc(postsRef, postId), {
         authorId,
         authorEmail,
         authorName: authorName || null,
-        content: '',
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
+        content,
+        createdAt: now,
+        updatedAt: now,
         exhibit: null,
     });
 }

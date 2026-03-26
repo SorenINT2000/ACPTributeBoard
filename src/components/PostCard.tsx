@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Card, Button, Form } from 'react-bootstrap';
-import { Pencil } from 'react-bootstrap-icons';
+import { Pencil, Trash } from 'react-bootstrap-icons';
 import { useAuth } from '../hooks/useAuth';
 import { updatePostExhibit } from '../hooks/postService';
 
@@ -19,6 +19,10 @@ interface PostCardProps {
     post: Post;
     onEdit: (postId: string) => void;
     onView: (postId: string) => void;
+    /** When set, owners see a delete control that calls this after confirmation */
+    onDelete?: (postId: string) => void | Promise<void>;
+    /** Called after Firestore exhibit update succeeds (e.g. patch local feed state) */
+    onExhibitUpdated?: (postId: string, exhibit: number | undefined) => void;
     cardRef?: (el: HTMLDivElement | null) => void;
 }
 
@@ -55,10 +59,12 @@ function extractFirstImage(html: string): { imageSrc: string | null; contentWith
     return { imageSrc: null, contentWithoutImage: html };
 }
 
-function PostCard({ post, onEdit, onView, cardRef }: PostCardProps) {
+function PostCard({ post, onEdit, onView, onDelete, onExhibitUpdated, cardRef }: PostCardProps) {
     const { currentUser, isHighLevel } = useAuth();
 
     const canEdit = !!currentUser && (currentUser.uid === post.authorId || isHighLevel);
+    const isOwner = !!currentUser && currentUser.uid === post.authorId;
+    const showDelete = isOwner && !!onDelete;
     const exhibitLabel = EXHIBIT_OPTIONS.find(opt => opt.value === (post.exhibit?.toString() || ''))?.label ?? 'No Exhibit';
     const [isHovered, setIsHovered] = useState(false);
     const [aspectRatio, setAspectRatio] = useState<number | null>(null);
@@ -120,11 +126,23 @@ function PostCard({ post, onEdit, onView, cardRef }: PostCardProps) {
         onEdit(post.id);
     };
 
+    const handleDeleteClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!onDelete) return;
+        if (!window.confirm('Delete this post? This cannot be undone.')) return;
+        void Promise.resolve(onDelete(post.id)).catch((err) => {
+            console.error('Failed to delete post:', err);
+        });
+    };
+
     const handleExhibitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         e.stopPropagation(); // Prevent card click from firing
         const value = e.target.value;
         const exhibitNumber = value === '' ? null : parseInt(value, 10);
         updatePostExhibit(post.id, exhibitNumber)
+            .then(() => {
+                onExhibitUpdated?.(post.id, exhibitNumber ?? undefined);
+            })
             .catch((error) => {
                 console.error('Failed to update exhibit:', error);
             });
@@ -170,7 +188,7 @@ function PostCard({ post, onEdit, onView, cardRef }: PostCardProps) {
                         <Card.Subtitle className={`mb-0 ${hasImage ? 'text-white-50' : 'text-muted'}`}>
                             {post.authorName || post.authorEmail}
                         </Card.Subtitle>
-                        {currentUser && (canEdit || isHighLevel) && (
+                        {currentUser && (canEdit || isHighLevel || showDelete) && (
                             <div className="d-flex gap-1 align-items-center" onClick={e => e.stopPropagation()}>
                                 {isHighLevel ? (
                                     <Form.Select
@@ -199,6 +217,17 @@ function PostCard({ post, onEdit, onView, cardRef }: PostCardProps) {
                                         className="flex items-center justify-center px-2 py-2"
                                     >
                                         <Pencil size={14} />
+                                    </Button>
+                                )}
+                                {showDelete && (
+                                    <Button
+                                        variant={hasImage ? 'light' : 'link'}
+                                        size="sm"
+                                        onClick={handleDeleteClick}
+                                        aria-label="Delete post"
+                                        className="flex items-center justify-center px-2 py-2 text-danger"
+                                    >
+                                        <Trash size={14} />
                                     </Button>
                                 )}
                             </div>

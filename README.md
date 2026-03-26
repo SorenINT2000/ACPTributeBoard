@@ -6,7 +6,7 @@ A tribute board web application for a California chapter ACP official stepping d
 
 - **Framework:** React 18 + TypeScript, bundled with Vite
 - **Backend:** Firebase (Firestore for posts/artifacts, Storage for uploads, Authentication for access control)
-- **Rich Text Editing:** TipTap editor with debounced auto-save to Firestore
+- **Rich Text Editing:** TipTap editor; posts persist only when the user clicks Save (no save-on-close)
 - **Routing:** React Router v6 (browser router)
 - **Styling:** Bootstrap 5.3 color modes (`data-bs-theme`) with CSS custom properties; light/dark/auto theme toggle
 
@@ -15,7 +15,7 @@ A tribute board web application for a California chapter ACP official stepping d
 ```
 User -> AuthContext (Firebase Auth) -> Page Component (Feed is public; Exhibit/Admin are protected)
 Page Component -> usePostEditor hook -> postService -> Firestore
-Feed Component -> postService -> Firestore (paginated fetch + IntersectionObserver infinite scroll + new-post banner)
+Feed Component -> postService -> Firestore (paginated fetch + IntersectionObserver infinite scroll + feed-refresh banner)
 Uploads -> imageUpload utils -> Firebase Storage -> Public URLs
 ```
 
@@ -27,19 +27,20 @@ Posts were previously stored in Firebase Realtime Database with Yjs CRDT-based l
 - Maintaining two databases (RTDB for posts, Firestore for artifacts/profiles) added operational complexity.
 - Firestore offers per-document read pricing, better querying (`orderBy`, `startAfter`), and predictable cost.
 
-Posts now use a simple TipTap editor with 500ms debounced auto-save. New posts are detected via a lightweight `onSnapshot` listener on the newest document; a "New posts available" banner lets users pull fresh content on demand instead of auto-loading.
+Posts use a simple TipTap editor. On the feed, **Create a Post** opens the editor with a client-generated id only; the Firestore document is created on the first **Save** (with the current HTML). Closing the modal without saving does not write to Firestore. Edits to existing posts also save only via **Save**; closing discards unsaved changes. A lightweight `onSnapshot` listener on the newest post document compares its id to the newest post the client has loaded; when they differ (e.g. someone posted, or the former top post was deleted), a "Feed may have changed" banner invites a manual refresh instead of auto-reloading the list.
 
 ## System Manifest
 
 - **AuthContext / useAuth**: Handles Firebase authentication state, login, signup, logout. Supports email/password and Google OAuth (via `signInWithPopup`).
-- **postService** (`src/hooks/postService.ts`): Firestore CRUD and query functions for posts — `createPost`, `updatePostContent`, `updatePostExhibit`, `deletePost`, `getPostsPaginated`, `getMorePosts`, `subscribeToPost`, `subscribeToNewestPost`, `subscribeToAllPosts`.
+- **postService** (`src/hooks/postService.ts`): Firestore CRUD and query functions for posts — `createPost` (optional initial `content`), `updatePostContent`, `updatePostExhibit`, `deletePost`, `getPostsPaginated`, `getMorePosts`, `subscribeToPost`, `subscribeToNewestPost`, `subscribeToAllPosts`.
 - **artifactService** (`src/hooks/artifactService.ts`): Firestore CRUD for artifacts — `subscribeToArtifacts`, `createArtifact`, `updateArtifact`, `deleteArtifact`.
-- **usePostEditor** (`src/hooks/usePostEditor.ts`): Hook that creates/manages a TipTap editor with debounced auto-save to Firestore. Loads content on mount, saves on edit, supports image upload and empty-post deletion.
+- **usePostEditor** (`src/hooks/usePostEditor.ts`): Manages a TipTap editor. Loads existing post content from Firestore, or starts empty for `isUnsavedDraft` (feed create flow). **Save** either runs `createPost` with editor HTML (first save of a draft) or `updatePostContent`. Image uploads use the draft id under `post-images/{postId}/` even before the document exists. Supports optional `onDraftSaved` after the first create.
 - **imageUpload utils**: Handles uploading post images and artifact files to Firebase Storage.
 - **exhibitImages utils** (`src/utils/exhibitImages.ts`): Lists, uploads, and deletes images from `website-images/exhibits/exhibit-{N}/` in Firebase Storage for the exhibit header carousel. Exposes `getExhibitImages` (URL list), `getExhibitImageEntries` (name+URL pairs sorted by filename), `uploadExhibitImage`, and `deleteExhibitImage`.
 - **CarouselEditorModal** (`src/components/CarouselEditorModal.tsx`): Admin-only modal for managing exhibit carousel images — view ordered file list with thumbnail tooltips on hover, upload new images, and delete existing ones. Order is determined by filename prefixes (`{NNN}-{timestamp}-{random}.{ext}`). No drag-and-drop reorder; admins control order via delete and re-upload.
 - **GalleryArrangement** (`GalleryArrangement.tsx`): Arrangement box for gallery artifacts; images can be positioned and resized (aspect-ratio locked via react-rnd); content saved as JSON `{ images: [{ url, x, y, scale, aspect }] }` with relative values (0–1).
-- **ArtifactSlideshow** (`ArtifactSlideshow.tsx`): Slideshow artifacts; users upload an ordered list of slide images. Content stored as JSON `{ slides: ["url1", "url2", ...] }`. Display card shows first slide with count badge. Modal opens a swipeable slide viewer with arrow/keyboard/touch navigation. Legacy HTML content (Google Slides iframes, PDF embeds) falls back to `dangerouslySetInnerHTML` rendering.
+- **ArtifactModal** (`ArtifactModal.tsx`): Shared viewer shell using react-bootstrap **`Modal`** (`show` / `onHide` via `onClose`). Forwards common props (`size`, `centered`, `backdrop`, `keyboard`, `scrollable`, `fullscreen`, `dialogClassName`, `contentClassName`, `backdropClassName`, `container`, etc.). `variant="video"` drops the header for full-bleed embeds.
+- **ArtifactSlideshow** (`ArtifactSlideshow.tsx`): Slideshow artifacts; users upload an ordered list of slide images. Content is stored only as JSON `{ slides: ["url1", "url2", ...] }`. Display card shows first slide with count badge. Modal opens a swipeable slide viewer with arrow/keyboard/touch navigation (`variant="video"` shell, no raw HTML embeds).
 - **userProfile utils**: Manages user display names and profile data.
 - **ThemeContext / useTheme**: Manages light/dark/auto theme preference. Persists to `localStorage`, sets `data-bs-theme` attribute on `<html>` so Bootstrap 5.3 color modes handle component styling natively. ADR: Switched from `@media (prefers-color-scheme)` CSS overrides to Bootstrap's `data-bs-theme` attribute to eliminate ~120 lines of manual Bootstrap dark mode overrides and enable a user-facing toggle.
 
@@ -47,7 +48,7 @@ Posts now use a simple TipTap editor with 500ms debounced auto-save. New posts a
 
 | Route | Component | Auth Required | Description |
 |-------|-----------|---------------|-------------|
-| `/` | `Feed` | No | Landing page with hero card and public social feed; authenticated users see "Create a Post" button |
+| `/` | `Feed` | No | Hero card, public feed, and onboarding copy: guests see a short “read without account” note; signed-in **non-staff** users see detailed “How to use this board” steps (save/cancel, edit/delete, exhibits, refresh banner); staff see only the compact hero + Create button |
 | `/login` | `Login` | No | Firebase authentication login |
 | `/signup` | `Signup` | No | New user registration |
 | `/exhibit` | `Exhibit` | Yes | Curated, structured walkthrough of exhibits with parallax scroll |
@@ -106,19 +107,21 @@ Static fallback images are in `public/exhibits/`: `bg-wellbeing.webp`, `bg-advoc
 
 ### Implemented and Working
 - Firebase Authentication (email/password + Google sign-in via popup) with protected routes for Exhibit/Admin
-- Public social feed (viewable without login) with hero card, paginated loading, and "new posts available" banner
-- Rich text editor (TipTap) with formatting toolbar, image upload, emoji support, debounced auto-save
+- Public social feed (viewable without login) with hero card, guest onboarding blurb, member-only detailed instructions for non-staff users, paginated loading, and optional "feed may have changed" refresh banner (driven by newest-post id mismatch)
+- Rich text editor (TipTap) with formatting toolbar, image upload, emoji support, explicit Save only (no save-on-close)
 - Exhibit page with 8 themed parallax sections
 - Exhibit parallax headers with auto-rotating image carousels (sourced from Firebase Storage) with static fallback images
 - Admin carousel editor modal for managing exhibit header images (upload, delete, filename-prefix ordering)
 - Artifact system: upload/edit curated content (videos, slideshows, documents, galleries)
 - Gallery artifacts: images in a draggable/resizable arrangement box (react-rnd); layout stored as JSON with relative coords (0–1)
-- Slideshow artifacts: ordered image upload with drag-to-reorder editor; swipeable slide viewer modal (arrow keys, touch swipe, click navigation); backward-compatible with legacy iframe embeds
+- Slideshow artifacts: ordered image upload with drag-to-reorder editor; swipeable slide viewer modal (arrow keys, touch swipe, click navigation); JSON `slides` array only
 - Light/dark/auto theme toggle in navbar (Bootstrap 5.3 color modes, localStorage persistence)
 - Masonry grid layout for posts
 - Post view modal for reading full posts
+- Post authors can delete their own posts from the feed and exhibit views (trash icon on the card, with confirmation); Firestore rules also allow Staff to delete any post
 - Admin dashboard (`/admin`): user list, promote members to Staff via `assignHighLevel` Cloud Function; nav link visible only to Staff
 
 ### Known Issues / Next Steps
 - Pandemic exhibit (#6) uses an external image; client may change or remove it in the final version
 - Existing data in RTDB is not migrated (fresh start); old RTDB rules locked down to deny all access
+- Deleting a post does not remove any images from storage

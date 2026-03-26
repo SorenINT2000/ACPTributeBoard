@@ -143,7 +143,7 @@ function imagesToDisplay(artifact: ArtifactProps['artifact']): GalleryImageLayou
 
 export default function ArtifactGallery({ artifact }: ArtifactProps) {
     const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
-    const images = useMemo(() => imagesToDisplay(artifact), [artifact.content]);
+    const images = useMemo(() => imagesToDisplay(artifact), [artifact]);
 
     if (images.length === 0) {
         return (

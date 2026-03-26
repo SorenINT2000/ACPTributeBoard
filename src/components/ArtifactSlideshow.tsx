@@ -10,14 +10,15 @@ interface SlideEntry {
     uploading?: boolean;
 }
 
-function parseSlidesContent(content: string): string[] | null {
+function parseSlidesContent(content: string): string[] {
+    if (!content.trim()) return [];
     try {
         const parsed = JSON.parse(content);
         if (parsed?.slides && Array.isArray(parsed.slides)) {
             return parsed.slides.filter((s: unknown) => typeof s === 'string');
         }
-    } catch { /* not JSON — legacy HTML */ }
-    return null;
+    } catch { /* invalid JSON */ }
+    return [];
 }
 
 // ---------------------------------------------------------------------------
@@ -38,8 +39,7 @@ const TRANSPARENT_IMG = (() => {
 
 export function ArtifactSlideshowEditor({ exhibitId, content, onContentChange }: ArtifactSlideshowEditorProps) {
     const [slides, setSlides] = useState<SlideEntry[]>(() => {
-        const urls = parseSlidesContent(content);
-        return urls ? urls.map(url => ({ url })) : [];
+        return parseSlidesContent(content).map(url => ({ url }));
     });
     const [dragActive, setDragActive] = useState(false);
     const [dragIdx, setDragIdx] = useState<number | null>(null);
@@ -324,8 +324,7 @@ function SlideViewer({ slides }: { slides: string[] }) {
 export default function ArtifactSlideshow({ artifact }: ArtifactProps) {
     const [modalOpen, setModalOpen] = useState(false);
     const slides = parseSlidesContent(artifact.content);
-    const isLegacy = slides === null;
-    const firstSlide = slides?.[0] ?? null;
+    const firstSlide = slides[0] ?? null;
 
     const preview = artifact.description.length > 100
         ? artifact.description.substring(0, 100) + '...'
@@ -348,7 +347,9 @@ export default function ArtifactSlideshow({ artifact }: ArtifactProps) {
                         )}
                         <div className="artifact-badge-container">
                             <span className="artifact-badge">
-                                {slides ? `${slides.length} Slide${slides.length !== 1 ? 's' : ''}` : 'Slideshow'}
+                                {slides.length > 0
+                                    ? `${slides.length} Slide${slides.length !== 1 ? 's' : ''}`
+                                    : 'Slideshow'}
                             </span>
                         </div>
                     </div>
@@ -357,27 +358,20 @@ export default function ArtifactSlideshow({ artifact }: ArtifactProps) {
                             <span className="artifact-title">{artifact.title}</span>
                         </div>
                         <p className="artifact-text">{preview || 'View presentation...'}</p>
-                        <div className="artifact-cta">Click to Open Archive</div>
                     </div>
                 </div>
             </div>
 
-            <ArtifactModal
-                show={modalOpen}
-                onClose={() => setModalOpen(false)}
-                variant={isLegacy ? 'default' : 'video'}
-                title={isLegacy ? artifact.title : undefined}
-                description={isLegacy ? artifact.description : undefined}
-            >
-                {isLegacy ? (
-                    <div
-                        className="artifact-modal-slideshow"
-                        dangerouslySetInnerHTML={{ __html: artifact.content }}
-                    />
-                ) : slides && slides.length > 0 ? (
+            <ArtifactModal show={modalOpen} onClose={() => setModalOpen(false)} variant="video">
+                {slides.length > 0 ? (
                     <SlideViewer slides={slides} />
                 ) : (
-                    <p className="text-muted text-center py-4">No slides to display.</p>
+                    <div className="text-muted text-center py-4 px-3">
+                        <p className="mb-0">No slides to display.</p>
+                        <small className="d-block mt-2">
+                            Add slide images in the artifact editor (content is stored as JSON).
+                        </small>
+                    </div>
                 )}
             </ArtifactModal>
         </>

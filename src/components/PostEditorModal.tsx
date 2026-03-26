@@ -14,20 +14,27 @@ interface PostEditorModalProps {
     onSave?: () => void;
     onClose: () => void;
     onUploadImage?: (file: File) => Promise<void>;
+    /** When true, Save is disabled (e.g. new draft with empty body) */
+    saveDisabled?: boolean;
 }
 
-function PostEditorModal({ show, activePost, editor, isReady, isDirty, isSaving, onSave, onClose, onUploadImage }: PostEditorModalProps) {
-    const handleClose = () => {
-        if (isDirty && onSave) {
-            onSave();
-        }
-        onClose();
-    };
+function PostEditorModal({
+    show,
+    activePost,
+    editor,
+    isReady,
+    isDirty,
+    isSaving,
+    onSave,
+    onClose,
+    onUploadImage,
+    saveDisabled,
+}: PostEditorModalProps) {
 
     return (
-        <Modal show={show} onHide={handleClose} size="lg">
-            <Modal.Header closeButton>
-                <Modal.Title>
+        <Modal show={show} onHide={onClose} size="lg">
+            <Modal.Header closeButton={false}>
+                <Modal.Title className="mb-0">
                     {activePost ? 'Edit Recognition Post' : 'Create Recognition Post'}
                 </Modal.Title>
             </Modal.Header>
@@ -47,25 +54,36 @@ function PostEditorModal({ show, activePost, editor, isReady, isDirty, isSaving,
                     </div>
                 )}
             </Modal.Body>
-            {isReady && onSave && (
-                <Modal.Footer>
-                    <span className="text-muted me-auto" style={{ fontSize: '0.8rem' }}>
-                        {isSaving ? 'Saving...' : isDirty ? 'Unsaved changes' : 'Saved'}
-                    </span>
+            <Modal.Footer className="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <span className="text-muted" style={{ fontSize: '0.8rem' }}>
+                    {isReady
+                        ? (isSaving ? 'Saving...' : isDirty ? 'Unsaved changes' : 'Saved')
+                        : '\u00a0'}
+                </span>
+                <div className="d-flex gap-2 ms-auto">
                     <Button
-                        variant="primary"
-                        onClick={onSave}
-                        disabled={!isDirty || isSaving}
+                        variant="outline-secondary"
+                        onClick={onClose}
+                        disabled={!!isSaving}
                     >
-                        {isSaving ? (
-                            <>
-                                <Spinner animation="border" size="sm" className="me-1" />
-                                Saving
-                            </>
-                        ) : 'Save'}
+                        Cancel
                     </Button>
-                </Modal.Footer>
-            )}
+                    {isReady && onSave && (
+                        <Button
+                            variant="primary"
+                            onClick={onSave}
+                            disabled={saveDisabled ?? (!isDirty || !!isSaving)}
+                        >
+                            {isSaving ? (
+                                <>
+                                    <Spinner animation="border" size="sm" className="me-1" />
+                                    Saving
+                                </>
+                            ) : 'Save'}
+                        </Button>
+                    )}
+                </div>
+            </Modal.Footer>
         </Modal>
     );
 }

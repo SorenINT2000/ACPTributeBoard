@@ -76,3 +76,8 @@
 - [ ] Privacy policy and terms of service
 - [ ] Cross-browser and mobile testing; accessibility (WCAG); performance and security testing
 - [ ] Launch kit: branded templates, video tutorials, communication plan, onboarding flow
+
+
+
+
+add sorenschultz.com, add skeleton loading for view/edit post modal images, fix flash/jitter in feed reload

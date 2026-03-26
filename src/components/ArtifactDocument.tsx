@@ -123,9 +123,6 @@ export function ArtifactDocumentEditor({ exhibitId, onContentChange }: ArtifactD
 export default function ArtifactDocument({ artifact }: ArtifactProps) {
     const [modalOpen, setModalOpen] = useState(false);
     const thumbnailUrl = getThumbnailUrl(artifact);
-    const preview = artifact.description.length > 100
-        ? artifact.description.substring(0, 100) + '...'
-        : artifact.description;
 
     return (
         <>
@@ -147,9 +144,11 @@ export default function ArtifactDocument({ artifact }: ArtifactProps) {
                 <div className="artifact-meta">
                     <div className="artifact-header">
                         <span className="artifact-title">{artifact.title}</span>
-                    </div>
-                    <p className="artifact-text">{preview || 'View document...'}</p>
-                    <div className="artifact-cta">Click to Open Archive</div>
+                    </div>{
+                        artifact.description && (
+                            <p className="artifact-text">{artifact.description}</p>
+                        )
+                    }
                 </div>
             </div>
         </div>

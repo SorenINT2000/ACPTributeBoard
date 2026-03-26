@@ -71,7 +71,6 @@ export default function ArtifactVideo({ artifact }: ArtifactProps) {
                         <span className="artifact-title">{artifact.title}</span>
                     </div>
                     <p className="artifact-text">{preview || 'View this exhibit...'}</p>
-                    <div className="artifact-cta">Click to Open Archive</div>
                 </div>
             </div>
         </div>

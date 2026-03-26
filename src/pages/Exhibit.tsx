@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { usePostEditor } from '../hooks/usePostEditor';
-import { subscribeToAllPosts } from '../hooks/postService';
+import { subscribeToAllPosts, deletePost as deletePostDocument } from '../hooks/postService';
 import { subscribeToArtifacts, deleteArtifact } from '../hooks/artifactService';
 import { parseGalleryContent } from '../utils/artifactUtils';
 import { deleteStorageFilesByUrls } from '../utils/imageUpload';
@@ -118,7 +118,7 @@ export default function Exhibit() {
     const [carouselEditorExhibitNumber, setCarouselEditorExhibitNumber] = useState<number | null>(null);
     const [carouselReloadKey, setCarouselReloadKey] = useState(0);
 
-    const { editor, isReady, isDirty, isSaving, save, deletePost, isEmpty } = usePostEditor({
+    const { editor, isReady, isDirty, isSaving, save } = usePostEditor({
         postId: activePostId,
         userId: currentUser?.uid ?? null,
     });
@@ -155,10 +155,17 @@ export default function Exhibit() {
         setViewPostId(postId);
     };
 
-    const handleCloseEditor = () => {
-        if (activePostId && isEmpty()) {
-            deletePost().catch(console.error);
+    const handleDeletePost = async (postId: string) => {
+        try {
+            await deletePostDocument(postId);
+            setActivePostId(current => (current === postId ? null : current));
+            setViewPostId(current => (current === postId ? null : current));
+        } catch (error) {
+            console.error('Failed to delete post:', error);
         }
+    };
+
+    const handleCloseEditor = () => {
         setActivePostId(null);
     };
 
@@ -250,6 +257,7 @@ export default function Exhibit() {
                     reloadKey={carouselReloadKey}
                     onViewPost={handleViewPost}
                     onEditPost={handleEditPost}
+                    onDeletePost={handleDeletePost}
                     onAddArtifact={handleAddArtifact}
                     onDeleteArtifact={handleDeleteArtifact}
                     onEditCarousel={handleEditCarousel}
@@ -281,6 +289,7 @@ export default function Exhibit() {
                 isSaving={isSaving}
                 onSave={save}
                 onClose={handleCloseEditor}
+                saveDisabled={isSaving || !isDirty}
             />
 
             <PostViewModal

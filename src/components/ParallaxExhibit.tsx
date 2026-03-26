@@ -26,6 +26,7 @@ export interface ParallaxExhibitProps {
     reloadKey: number;
     onViewPost: (postId: string) => void;
     onEditPost: (postId: string) => void;
+    onDeletePost: (postId: string) => void | Promise<void>;
     onAddArtifact: (exhibitNumber: number) => void;
     onDeleteArtifact: (artifact: ArtifactType) => void;
     onEditCarousel: (exhibitNumber: number) => void;
@@ -44,6 +45,7 @@ const ParallaxExhibit = ({
     reloadKey,
     onViewPost,
     onEditPost,
+    onDeletePost,
     onAddArtifact,
     onDeleteArtifact,
     onEditCarousel,
@@ -169,6 +171,7 @@ const ParallaxExhibit = ({
                                 post={post}
                                 onView={onViewPost}
                                 onEdit={onEditPost}
+                                onDelete={onDeletePost}
                                 cardRef={ref}
                             />
                         )}

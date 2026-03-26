@@ -7,11 +7,27 @@ import Image from '@tiptap/extension-image';
 import FileHandler from '@tiptap/extension-file-handler';
 import Emoji, { emojis } from '@tiptap/extension-emoji';
 import { uploadPostImageToStorage } from '../utils/imageUpload';
-import { getPostContent, updatePostContent, deletePost as deletePostService } from './postService';
+import {
+    getPostContent,
+    updatePostContent,
+    deletePost as deletePostService,
+    createPost as createPostService,
+} from './postService';
+
+export interface DraftAuthorMeta {
+    email: string | null;
+    authorName?: string;
+}
 
 interface UsePostEditorOptions {
     postId: string | null;
     userId: string | null;
+    /** True while the post id exists only client-side; first Save calls createPost with editor HTML */
+    isUnsavedDraft?: boolean;
+    /** Required when isUnsavedDraft; used on first Save */
+    draftAuthor?: DraftAuthorMeta | null;
+    /** Called after createPost succeeds (e.g. clear draft flag and refresh feed) */
+    onDraftSaved?: () => void;
 }
 
 interface UsePostEditorResult {
@@ -25,15 +41,29 @@ interface UsePostEditorResult {
     uploadImage: (file: File) => Promise<void>;
 }
 
-export function usePostEditor({ postId, userId }: UsePostEditorOptions): UsePostEditorResult {
+export function usePostEditor({
+    postId,
+    userId,
+    isUnsavedDraft = false,
+    draftAuthor = null,
+    onDraftSaved,
+}: UsePostEditorOptions): UsePostEditorResult {
     const [isReady, setIsReady] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const postIdRef = useRef<string | null>(postId);
+    const userIdRef = useRef<string | null>(userId);
     const lastSyncedRef = useRef('');
     const isSettingContentRef = useRef(false);
+    const isUnsavedDraftRef = useRef(isUnsavedDraft);
+    const draftAuthorRef = useRef<DraftAuthorMeta | null>(draftAuthor);
+    const onDraftSavedRef = useRef(onDraftSaved);
 
     useEffect(() => { postIdRef.current = postId; }, [postId]);
+    useEffect(() => { userIdRef.current = userId; }, [userId]);
+    useEffect(() => { isUnsavedDraftRef.current = isUnsavedDraft; }, [isUnsavedDraft]);
+    useEffect(() => { draftAuthorRef.current = draftAuthor; }, [draftAuthor]);
+    useEffect(() => { onDraftSavedRef.current = onDraftSaved; }, [onDraftSaved]);
 
     const handleImageUpload = useCallback(async (file: File, currentEditor: Editor, position: number) => {
         const pid = postIdRef.current;
@@ -79,11 +109,22 @@ export function usePostEditor({ postId, userId }: UsePostEditorOptions): UsePost
         },
     }, [handleImageUpload]);
 
-    // Load content from Firestore when postId changes
+    // Load: empty local draft vs fetch existing document
     useEffect(() => {
         if (!postId || !userId || !editor) {
             setIsReady(false);
             setIsDirty(false);
+            return;
+        }
+
+        if (isUnsavedDraft) {
+            setIsReady(false);
+            setIsDirty(false);
+            isSettingContentRef.current = true;
+            editor.commands.setContent('');
+            lastSyncedRef.current = editor.getHTML();
+            isSettingContentRef.current = false;
+            setIsReady(true);
             return;
         }
 
@@ -104,9 +145,8 @@ export function usePostEditor({ postId, userId }: UsePostEditorOptions): UsePost
         });
 
         return () => { cancelled = true; };
-    }, [postId, userId, editor]);
+    }, [postId, userId, editor, isUnsavedDraft]);
 
-    // Track dirty state on editor updates
     useEffect(() => {
         if (!editor || !isReady) return;
 
@@ -121,7 +161,8 @@ export function usePostEditor({ postId, userId }: UsePostEditorOptions): UsePost
 
     const save = useCallback(async () => {
         const pid = postIdRef.current;
-        if (!pid || !editor || editor.isDestroyed) return;
+        const uid = userIdRef.current;
+        if (!pid || !uid || !editor || editor.isDestroyed) return;
         const html = editor.getHTML();
         if (html === lastSyncedRef.current) {
             setIsDirty(false);
@@ -129,11 +170,29 @@ export function usePostEditor({ postId, userId }: UsePostEditorOptions): UsePost
         }
         setIsSaving(true);
         try {
-            await updatePostContent(pid, html);
-            lastSyncedRef.current = html;
-            setIsDirty(false);
+            if (isUnsavedDraftRef.current) {
+                const meta = draftAuthorRef.current;
+                if (!meta) {
+                    console.error('Cannot save draft: missing author metadata');
+                    return;
+                }
+                await createPostService(
+                    pid,
+                    uid,
+                    meta.email,
+                    meta.authorName,
+                    html,
+                );
+                onDraftSavedRef.current?.();
+                lastSyncedRef.current = html;
+                setIsDirty(false);
+            } else {
+                await updatePostContent(pid, html);
+                lastSyncedRef.current = html;
+                setIsDirty(false);
+            }
         } catch (err) {
-            console.error('Error saving content:', err);
+            console.error('Error saving post:', err);
         } finally {
             setIsSaving(false);
         }
@@ -141,7 +200,6 @@ export function usePostEditor({ postId, userId }: UsePostEditorOptions): UsePost
 
     useEffect(() => { saveRef.current = save; }, [save]);
 
-    // Clear editor content when postId becomes null
     useEffect(() => {
         if (!postId && editor && !editor.isDestroyed) {
             isSettingContentRef.current = true;
