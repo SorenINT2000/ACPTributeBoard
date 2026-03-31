@@ -66,7 +66,6 @@ function PostCard({ post, onEdit, onView, onDelete, onExhibitUpdated, cardRef }:
     const isOwner = !!currentUser && currentUser.uid === post.authorId;
     const showDelete = isOwner && !!onDelete;
     const exhibitLabel = EXHIBIT_OPTIONS.find(opt => opt.value === (post.exhibit?.toString() || ''))?.label ?? 'No Exhibit';
-    const [isHovered, setIsHovered] = useState(false);
     const [aspectRatio, setAspectRatio] = useState<number | null>(null);
 
     const { imageSrc, contentWithoutImage } = useMemo(
@@ -75,6 +74,8 @@ function PostCard({ post, onEdit, onView, onDelete, onExhibitUpdated, cardRef }:
     );
 
     const hasImage = !!imageSrc;
+    /** Width/height for CSS aspect-ratio on the top image band (~16:9 until metadata loads). */
+    const imageBandAspect = aspectRatio ?? 16 / 9;
 
     // Load image and calculate aspect ratio
     useEffect(() => {
@@ -151,41 +152,21 @@ function PostCard({ post, onEdit, onView, onDelete, onExhibitUpdated, cardRef }:
     return (
         <div ref={cardRef}>
             <Card
-                className={hasImage ? 'post-card-with-image' : ''}
-                style={{
-                    cursor: 'pointer',
-                    ...(hasImage ? {
-                        position: 'relative',
-                        overflow: 'hidden',
-                        // Use aspect-ratio if available, otherwise fall back to minHeight
-                        ...(aspectRatio ? { aspectRatio: aspectRatio } : { minHeight: '280px' }),
-                    } : {}),
-                }}
+                className={hasImage ? 'post-card post-card--with-image' : 'post-card'}
+                style={{ cursor: 'pointer' }}
                 onClick={handleCardClick}
-                onMouseEnter={() => hasImage && setIsHovered(true)}
-                onMouseLeave={() => hasImage && setIsHovered(false)}
             >
                 {hasImage && (
                     <div
-                        className="post-card-bg post-card-old-style"
-                        style={{
-                            backgroundImage: `url(${imageSrc})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                        }}
-                        aria-hidden
-                    />
+                        className="post-card-image-top post-card-old-style"
+                        style={{ aspectRatio: imageBandAspect }}
+                    >
+                        <img src={imageSrc!} alt="" className="post-card-image-top-img" />
+                    </div>
                 )}
-                <Card.Body
-                    className={hasImage ? 'd-flex flex-column justify-content-end' : ''}
-                    style={hasImage ? {
-                        opacity: isHovered ? 1 : 0,
-                        transform: isHovered ? 'translateY(0)' : 'translateY(20px)',
-                        transition: 'opacity 0.35s ease, transform 0.35s ease',
-                    } : undefined}
-                >
+                <Card.Body>
                     <div className="d-flex justify-content-between align-items-start mb-2">
-                        <Card.Subtitle className={`mb-0 ${hasImage ? 'text-white-50' : 'text-muted'}`}>
+                        <Card.Subtitle className="mb-0 text-muted">
                             {post.authorName || post.authorEmail}
                         </Card.Subtitle>
                         {currentUser && (canEdit || isHighLevel || showDelete) && (
@@ -204,13 +185,13 @@ function PostCard({ post, onEdit, onView, onDelete, onExhibitUpdated, cardRef }:
                                         ))}
                                     </Form.Select>
                                 ) : (
-                                    <span className={`text-xs pr-2.5 ${hasImage ? 'text-white/50' : 'text-muted'}`}>
+                                    <span className="text-xs pr-2.5 text-muted">
                                         {exhibitLabel}
                                     </span>
                                 )}
                                 {canEdit && (
                                     <Button
-                                        variant={hasImage ? 'light' : 'link'}
+                                        variant="link"
                                         size="sm"
                                         onClick={handleEditClick}
                                         aria-label="Edit post"
@@ -221,7 +202,7 @@ function PostCard({ post, onEdit, onView, onDelete, onExhibitUpdated, cardRef }:
                                 )}
                                 {showDelete && (
                                     <Button
-                                        variant={hasImage ? 'light' : 'link'}
+                                        variant="link"
                                         size="sm"
                                         onClick={handleDeleteClick}
                                         aria-label="Delete post"
@@ -235,10 +216,10 @@ function PostCard({ post, onEdit, onView, onDelete, onExhibitUpdated, cardRef }:
                     </div>
                     <div
                         dangerouslySetInnerHTML={{ __html: contentWithoutImage }}
-                        className={`post-content ${hasImage ? 'post-content-overlay' : ''}`}
+                        className="post-content"
                     />
                     <Card.Text
-                        className={`mt-2 ${hasImage ? 'text-white-50' : 'text-muted'}`}
+                        className="mt-2 text-muted"
                         style={{ fontSize: '0.875rem' }}
                     >
                         {formatDate(post.createdAt)}

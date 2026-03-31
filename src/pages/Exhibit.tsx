@@ -122,10 +122,20 @@ export default function Exhibit() {
         setActivePostId(null);
     };
 
+    const handlePostSaved = (detail: { postId: string; content: string }) => {
+        const now = Date.now();
+        setPosts(prev =>
+            prev.map(p =>
+                p.id === detail.postId ? { ...p, content: detail.content, updatedAt: now } : p,
+            ),
+        );
+        handleCloseEditor();
+    };
+
     const { editor, isReady, isDirty, isSaving, save } = usePostEditor({
         postId: activePostId,
         userId: currentUser?.uid ?? null,
-        onSaved: handleCloseEditor,
+        onSaved: handlePostSaved,
     });
 
     useEffect(() => {

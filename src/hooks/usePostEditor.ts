@@ -19,6 +19,11 @@ export interface DraftAuthorMeta {
     authorName?: string;
 }
 
+export interface PostSavedDetail {
+    postId: string;
+    content: string;
+}
+
 interface UsePostEditorOptions {
     postId: string | null;
     userId: string | null;
@@ -28,8 +33,8 @@ interface UsePostEditorOptions {
     draftAuthor?: DraftAuthorMeta | null;
     /** Called after createPost succeeds (e.g. clear draft flag and refresh feed) */
     onDraftSaved?: () => void;
-    /** Called after a successful save (create or update); e.g. close the editor modal */
-    onSaved?: () => void;
+    /** Called after a successful save (create or update) with persisted HTML — patch local lists, close modal, etc. */
+    onSaved?: (detail: PostSavedDetail) => void;
 }
 
 interface UsePostEditorResult {
@@ -196,7 +201,7 @@ export function usePostEditor({
                 lastSyncedRef.current = html;
                 setIsDirty(false);
             }
-            onSavedRef.current?.();
+            onSavedRef.current?.({ postId: pid, content: html });
         } catch (err) {
             console.error('Error saving post:', err);
         } finally {

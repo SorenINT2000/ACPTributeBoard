@@ -129,6 +129,19 @@ function Feed() {
         setIsUnsavedDraft(false);
     }, []);
 
+    const handlePostSaved = useCallback(
+        (detail: { postId: string; content: string }) => {
+            const now = Date.now();
+            setPosts(prev =>
+                prev.map(p =>
+                    p.id === detail.postId ? { ...p, content: detail.content, updatedAt: now } : p,
+                ),
+            );
+            handleCloseEditor();
+        },
+        [handleCloseEditor],
+    );
+
     const { editor, isReady, isDirty, isSaving, save, isEmpty, uploadImage } = usePostEditor({
         postId: activePostId,
         userId: currentUser?.uid ?? null,
@@ -141,7 +154,7 @@ function Feed() {
                 }
                 : null,
         onDraftSaved: handleDraftSaved,
-        onSaved: handleCloseEditor,
+        onSaved: handlePostSaved,
     });
 
     const loadMorePosts = useCallback(async () => {
