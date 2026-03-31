@@ -1,6 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/Layout';
 import Feed from './pages/Feed';
 import Exhibit from './pages/Exhibit';
@@ -53,11 +52,9 @@ const router = createBrowserRouter([
 
 function App() {
     return (
-        <ThemeProvider>
-            <AuthProvider>
-                <RouterProvider router={router} />
-            </AuthProvider>
-        </ThemeProvider>
+        <AuthProvider>
+            <RouterProvider router={router} />
+        </AuthProvider>
     );
 }
 

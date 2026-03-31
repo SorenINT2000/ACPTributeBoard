@@ -118,9 +118,14 @@ export default function Exhibit() {
     const [carouselEditorExhibitNumber, setCarouselEditorExhibitNumber] = useState<number | null>(null);
     const [carouselReloadKey, setCarouselReloadKey] = useState(0);
 
+    const handleCloseEditor = () => {
+        setActivePostId(null);
+    };
+
     const { editor, isReady, isDirty, isSaving, save } = usePostEditor({
         postId: activePostId,
         userId: currentUser?.uid ?? null,
+        onSaved: handleCloseEditor,
     });
 
     useEffect(() => {
@@ -163,10 +168,6 @@ export default function Exhibit() {
         } catch (error) {
             console.error('Failed to delete post:', error);
         }
-    };
-
-    const handleCloseEditor = () => {
-        setActivePostId(null);
     };
 
     const handleCloseView = () => {
@@ -224,7 +225,8 @@ export default function Exhibit() {
             {/* Intro Section */}
             <div className="exhibit-intro">
                 <div className="exhibit-intro-content">
-                    <h1 className="exhibit-title">A Decade of Leadership</h1>
+                    <h1 className="exhibit-title-eyebrow">CELEBRATING A DECADE OF</h1>
+                    <h1 className="exhibit-title">INSPIRING LEADERSHIP</h1>
                     <p className="exhibit-description">
                         Explore the exhibits below to relive the moments, the milestones, and the memories.
                     </p>
@@ -278,6 +280,34 @@ export default function Exhibit() {
                     <b>Thank you</b> for an incredible decade of trailblazing <b>leadership</b>, remarkable <b>impact</b>, and an unwavering <b>commitment</b> to advancing ACP's mission, culture, and growth!
                 </p>
             </div>
+
+            <section className="exhibit-legacy-cta" aria-labelledby="exhibit-legacy-cta-heading">
+                <div className="exhibit-legacy-cta-inner">
+                    <img
+                        src="/carry-the-legacy-forward.png"
+                        alt="Carry the legacy forward — support emerging leaders in accessible conference travel"
+                        className="exhibit-legacy-cta-image"
+                        loading="lazy"
+                        decoding="async"
+                    />
+                    <h2 id="exhibit-legacy-cta-heading" className="exhibit-legacy-cta-heading">
+                        Carry Dr. Moyer's legacy forward!
+                    </h2>
+                    <p className="exhibit-legacy-cta-lead mb-4">
+                        Empower the next generation of leaders by contributing to the<br/>
+                        <strong>Emerging Leaders Internal Medicine Meeting Travel Award:</strong>
+                    </p>
+
+                    <a
+                        className="btn btn-primary"
+                        href="https://secure.givelively.org/donate/american-college-of-physicians-inc/the-emerging-leaders-internal-medicine-meeting-travel-award"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Donate Now
+                    </a>
+                </div>
+            </section>
 
             {/* Modals */}
             <PostEditorModal

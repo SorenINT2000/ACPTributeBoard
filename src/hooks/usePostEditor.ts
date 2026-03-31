@@ -28,6 +28,8 @@ interface UsePostEditorOptions {
     draftAuthor?: DraftAuthorMeta | null;
     /** Called after createPost succeeds (e.g. clear draft flag and refresh feed) */
     onDraftSaved?: () => void;
+    /** Called after a successful save (create or update); e.g. close the editor modal */
+    onSaved?: () => void;
 }
 
 interface UsePostEditorResult {
@@ -47,6 +49,7 @@ export function usePostEditor({
     isUnsavedDraft = false,
     draftAuthor = null,
     onDraftSaved,
+    onSaved,
 }: UsePostEditorOptions): UsePostEditorResult {
     const [isReady, setIsReady] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
@@ -58,12 +61,14 @@ export function usePostEditor({
     const isUnsavedDraftRef = useRef(isUnsavedDraft);
     const draftAuthorRef = useRef<DraftAuthorMeta | null>(draftAuthor);
     const onDraftSavedRef = useRef(onDraftSaved);
+    const onSavedRef = useRef(onSaved);
 
     useEffect(() => { postIdRef.current = postId; }, [postId]);
     useEffect(() => { userIdRef.current = userId; }, [userId]);
     useEffect(() => { isUnsavedDraftRef.current = isUnsavedDraft; }, [isUnsavedDraft]);
     useEffect(() => { draftAuthorRef.current = draftAuthor; }, [draftAuthor]);
     useEffect(() => { onDraftSavedRef.current = onDraftSaved; }, [onDraftSaved]);
+    useEffect(() => { onSavedRef.current = onSaved; }, [onSaved]);
 
     const handleImageUpload = useCallback(async (file: File, currentEditor: Editor, position: number) => {
         const pid = postIdRef.current;
@@ -191,6 +196,7 @@ export function usePostEditor({
                 lastSyncedRef.current = html;
                 setIsDirty(false);
             }
+            onSavedRef.current?.();
         } catch (err) {
             console.error('Error saving post:', err);
         } finally {

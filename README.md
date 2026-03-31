@@ -8,7 +8,13 @@ A tribute board web application for a California chapter ACP official stepping d
 - **Backend:** Firebase (Firestore for posts/artifacts, Storage for uploads, Authentication for access control)
 - **Rich Text Editing:** TipTap editor; posts persist only when the user clicks Save (no save-on-close)
 - **Routing:** React Router v6 (browser router)
-- **Styling:** Bootstrap 5.3 color modes (`data-bs-theme`) with CSS custom properties; light/dark/auto theme toggle
+- **Styling:** Bootstrap 5.3 with `data-bs-theme="light"` on `<html>` (fixed light mode) and CSS custom properties in [`src/index.css`](src/index.css)
+
+### Visual language: warm tribute (site-wide)
+
+- **Feed and global UI** use a **warm neutral** page background (`--color-bg`, paper tones) and a **terracotta primary** (`#a63c1a`) for links and `Button variant="primary"`, mapped via `--bs-primary` and related Bootstrap variables in [`src/index.css`](src/index.css). The Feed hero card ([`feed-hero-card`](src/pages/Feed.tsx)) adds a soft paper gradient and restrained top accent line.
+- **Exhibit** uses the same accent for chapter dividers (`border-top` on `.chapter-content`), artifact highlights (`--color-primary` → `--color-accent-primary`), and **warm umber** full-bleed bands for the intro, page shell, and outro (`--color-exhibit-hero-bg` / `--color-exhibit-hero-bg-end`) instead of cool slate. Parallax headers stay photo-forward with neutral dimmers; typography on the intro uses warm gray tints to match the Feed.
+- **Typography:** **Playfair Display** (display) and **Source Sans 3** (body) are loaded from Google Fonts in [`index.html`](index.html). CSS variables `--font-display` and `--font-body` in [`src/index.css`](src/index.css) align the Feed hero title with Exhibit headings (`var(--font-display)`).
 
 ### Data Flow
 
@@ -27,14 +33,14 @@ Posts were previously stored in Firebase Realtime Database with Yjs CRDT-based l
 - Maintaining two databases (RTDB for posts, Firestore for artifacts/profiles) added operational complexity.
 - Firestore offers per-document read pricing, better querying (`orderBy`, `startAfter`), and predictable cost.
 
-Posts use a simple TipTap editor. On the feed, **Create a Post** opens the editor with a client-generated id only; the Firestore document is created on the first **Save** (with the current HTML). Closing the modal without saving does not write to Firestore. Edits to existing posts also save only via **Save**; closing discards unsaved changes. A lightweight `onSnapshot` listener on the newest post document compares its id to the newest post the client has loaded; when they differ (e.g. someone posted, or the former top post was deleted), a "Feed may have changed" banner invites a manual refresh instead of auto-reloading the list.
+Posts use a simple TipTap editor. On the feed, **Create a Post** opens the editor with a client-generated id only; the Firestore document is created on the first **Save** (with the current HTML), after which the modal closes. Closing via **Cancel** without saving does not write to Firestore. Edits to existing posts save only via **Save**; a successful **Save** closes the modal, and **Cancel** discards unsaved changes. A lightweight `onSnapshot` listener on the newest post document compares its id to the newest post the client has loaded; when they differ (e.g. someone posted, or the former top post was deleted), a "Feed may have changed" banner invites a manual refresh instead of auto-reloading the list.
 
 ## System Manifest
 
 - **AuthContext / useAuth**: Handles Firebase authentication state, login, signup, logout. Supports email/password and Google OAuth (via `signInWithPopup`).
 - **postService** (`src/hooks/postService.ts`): Firestore CRUD and query functions for posts — `createPost` (optional initial `content`), `updatePostContent`, `updatePostExhibit`, `deletePost`, `getPostsPaginated`, `getMorePosts`, `subscribeToPost`, `subscribeToNewestPost`, `subscribeToAllPosts`.
 - **artifactService** (`src/hooks/artifactService.ts`): Firestore CRUD for artifacts — `subscribeToArtifacts`, `createArtifact`, `updateArtifact`, `deleteArtifact`.
-- **usePostEditor** (`src/hooks/usePostEditor.ts`): Manages a TipTap editor. Loads existing post content from Firestore, or starts empty for `isUnsavedDraft` (feed create flow). **Save** either runs `createPost` with editor HTML (first save of a draft) or `updatePostContent`. Image uploads use the draft id under `post-images/{postId}/` even before the document exists. Supports optional `onDraftSaved` after the first create.
+- **usePostEditor** (`src/hooks/usePostEditor.ts`): Manages a TipTap editor. Loads existing post content from Firestore, or starts empty for `isUnsavedDraft` (feed create flow). **Save** either runs `createPost` with editor HTML (first save of a draft) or `updatePostContent`. Image uploads use the draft id under `post-images/{postId}/` even before the document exists. Supports optional `onDraftSaved` after the first create and optional `onSaved` after any successful save (used to close the editor modal on Feed and Exhibit).
 - **imageUpload utils**: Handles uploading post images and artifact files to Firebase Storage.
 - **exhibitImages utils** (`src/utils/exhibitImages.ts`): Lists, uploads, and deletes images from `website-images/exhibits/exhibit-{N}/` in Firebase Storage for the exhibit header carousel. Exposes `getExhibitImages` (URL list), `getExhibitImageEntries` (name+URL pairs sorted by filename), `uploadExhibitImage`, and `deleteExhibitImage`.
 - **CarouselEditorModal** (`src/components/CarouselEditorModal.tsx`): Admin-only modal for managing exhibit carousel images — view ordered file list with thumbnail tooltips on hover, upload new images, and delete existing ones. Order is determined by filename prefixes (`{NNN}-{timestamp}-{random}.{ext}`). No drag-and-drop reorder; admins control order via delete and re-upload.
@@ -42,7 +48,6 @@ Posts use a simple TipTap editor. On the feed, **Create a Post** opens the edito
 - **ArtifactModal** (`ArtifactModal.tsx`): Shared viewer shell using react-bootstrap **`Modal`** (`show` / `onHide` via `onClose`). Forwards common props (`size`, `centered`, `backdrop`, `keyboard`, `scrollable`, `fullscreen`, `dialogClassName`, `contentClassName`, `backdropClassName`, `container`, etc.). `variant="video"` drops the header for full-bleed embeds.
 - **ArtifactSlideshow** (`ArtifactSlideshow.tsx`): Slideshow artifacts; users upload an ordered list of slide images. Content is stored only as JSON `{ slides: ["url1", "url2", ...] }`. Display card shows first slide with count badge. Modal opens a swipeable slide viewer with arrow/keyboard/touch navigation (`variant="video"` shell, no raw HTML embeds).
 - **userProfile utils**: Manages user display names and profile data.
-- **ThemeContext / useTheme**: Manages light/dark/auto theme preference. Persists to `localStorage`, sets `data-bs-theme` attribute on `<html>` so Bootstrap 5.3 color modes handle component styling natively. ADR: Switched from `@media (prefers-color-scheme)` CSS overrides to Bootstrap's `data-bs-theme` attribute to eliminate ~120 lines of manual Bootstrap dark mode overrides and enable a user-facing toggle.
 
 ## Pages
 
@@ -60,6 +65,7 @@ The Exhibit page uses a static `EXHIBITS` config array that defines 8 themed exh
 - Parallax scroll header (sticky positioning with background image carousel, title, and quote)
 - Dynamic artifacts (uploaded via the Artifact Editor)
 - User-contributed posts (filtered by exhibit number)
+- After the thank-you outro, a **legacy CTA** block shows `public/carry-the-legacy-forward.png` and links to the GiveLively donation page for the **Emerging Leaders Internal Medicine Meeting Travel Award** (American College of Physicians)
 
 ### Exhibit Header Carousel
 
@@ -82,12 +88,12 @@ Each exhibit header supports an auto-rotating image carousel. Images are loaded 
 | 7 | Leadership Development | Ross Simmonds |
 | 8 | Legacy | Maya Angelou |
 
-Static fallback images are in `public/exhibits/`: `bg-wellbeing.webp`, `bg-advocacy.webp`, `chapter.webp`, `bg-med-ed.webp`, `bg-professional-home.webp`, `bg-leaders.webp`, `bg-legacy.webp`. Exhibit 6 uses an external Unsplash URL. When carousel images exist in Firebase Storage (`website-images/exhibits/exhibit-{N}/`), they take precedence over the static fallback.
+Static fallback images are in `public/exhibits/`: `bg-wellbeing.webp`, `bg-advocacy.webp`, `chapter.webp`, `bg-med-ed.webp`, `bg-professional-home.webp`, `bg-leaders.webp`, `bg-legacy.webp`. Exhibit 6 uses an external Unsplash URL. When carousel images exist in Firebase Storage (`website-images/exhibits/exhibit-{N}/`), they take precedence over the static fallback. `public/carry-the-legacy-forward.png` is used only on the Exhibit page footer CTA (not exhibit headers).
 
 ## Scene Bootstrapping
 
 1. `main.tsx` renders `<App />`.
-2. `App.tsx` wraps everything in `<ThemeProvider>` then `<AuthProvider>` and sets up the `BrowserRouter` with routes. `ThemeProvider` sets `data-bs-theme` on `<html>` and persists the user's preference to `localStorage`.
+2. `App.tsx` wraps the app in `<AuthProvider>` and the `BrowserRouter`. [`index.html`](index.html) sets `data-bs-theme="light"` and `color-scheme: light` on `<html>` before paint.
 3. The feed (`/`) is publicly accessible. Protected routes (`/exhibit`) are wrapped in `<ProtectedRoute>`; `/admin` uses `<AdminRoute>` (requires `isHighLevel` claim).
 4. `Layout` component provides the `<Navbar>` and `<Outlet>` structure.
 
@@ -106,6 +112,7 @@ Static fallback images are in `public/exhibits/`: `bg-wellbeing.webp`, `bg-advoc
 ## Current State & Known Issues
 
 ### Implemented and Working
+- Visual theme: light mode only; warm paper-style surfaces and terracotta primary; Playfair Display + Source Sans 3; Feed hero gradient (`.feed-hero-card`); Exhibit intro/outro and page shell use warm umber bands aligned with the same palette
 - Firebase Authentication (email/password + Google sign-in via popup) with protected routes for Exhibit/Admin
 - Public social feed (viewable without login) with hero card, guest onboarding blurb, member-only detailed instructions for non-staff users, paginated loading, and optional "feed may have changed" refresh banner (driven by newest-post id mismatch)
 - Rich text editor (TipTap) with formatting toolbar, image upload, emoji support, explicit Save only (no save-on-close)
@@ -115,7 +122,6 @@ Static fallback images are in `public/exhibits/`: `bg-wellbeing.webp`, `bg-advoc
 - Artifact system: upload/edit curated content (videos, slideshows, documents, galleries)
 - Gallery artifacts: images in a draggable/resizable arrangement box (react-rnd); layout stored as JSON with relative coords (0–1)
 - Slideshow artifacts: ordered image upload with drag-to-reorder editor; swipeable slide viewer modal (arrow keys, touch swipe, click navigation); JSON `slides` array only
-- Light/dark/auto theme toggle in navbar (Bootstrap 5.3 color modes, localStorage persistence)
 - Masonry grid layout for posts
 - Post view modal for reading full posts
 - Post authors can delete their own posts from the feed and exhibit views (trash icon on the card, with confirmation); Firestore rules also allow Staff to delete any post

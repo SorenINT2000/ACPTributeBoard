@@ -1,21 +1,15 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Navbar as BootstrapNavbar, Nav, Container, Button } from 'react-bootstrap';
-import { SunFill, MoonStarsFill, CircleHalf, BoxArrowRight, PersonCircle } from 'react-bootstrap-icons';
+import { Navbar as BootstrapNavbar, Nav, Container } from 'react-bootstrap';
+import { BoxArrowRight, PersonCircle } from 'react-bootstrap-icons';
 import { useAuth } from '../hooks/useAuth';
-import { useTheme, type ThemePreference } from '../contexts/ThemeContext';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
-
-const THEME_CYCLE: ThemePreference[] = ['light', 'dark', 'auto'];
-const THEME_ICON = { light: SunFill, dark: MoonStarsFill, auto: CircleHalf } as const;
-const THEME_LABEL = { light: 'Light', dark: 'Dark', auto: 'Auto' } as const;
 
 const SCROLL_THRESHOLD = 8;
 
 function Navbar() {
     const { currentUser, isHighLevel } = useAuth();
-    const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
     const [hidden, setHidden] = useState(false);
     const [expanded, setExpanded] = useState(false);
@@ -34,13 +28,6 @@ function Navbar() {
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, [handleScroll]);
-
-    const cycleTheme = () => {
-        const idx = THEME_CYCLE.indexOf(theme);
-        setTheme(THEME_CYCLE[(idx + 1) % THEME_CYCLE.length]);
-    };
-
-    const ThemeIcon = THEME_ICON[theme];
 
     const handleSignOut = async () => {
         try {
@@ -64,21 +51,7 @@ function Navbar() {
                     Dr. Moyer's Tribute Board
                 </BootstrapNavbar.Brand>
 
-                {/* Always-visible controls beside the brand (mobile + desktop) */}
-                <div className="d-flex align-items-center gap-2 order-2 order-lg-3 ms-auto ms-lg-0">
-                    <Button
-                        variant="link"
-                        className="nav-link d-flex align-items-center gap-1 px-2"
-                        onClick={cycleTheme}
-                        title={`Theme: ${THEME_LABEL[theme]}`}
-                        aria-label={`Switch theme (current: ${THEME_LABEL[theme]})`}
-                    >
-                        <ThemeIcon size={16} />
-                        <span className="d-none d-lg-inline" style={{ fontSize: '0.8rem' }}>{THEME_LABEL[theme]}</span>
-                    </Button>
-                </div>
-
-                <BootstrapNavbar.Collapse id="main-navbar-nav" className="order-3 order-lg-2">
+                <BootstrapNavbar.Collapse id="main-navbar-nav" className="order-2 order-lg-2">
                     <Nav className="me-auto">
                         <Nav.Link as={Link} to="/" onClick={closeDrawer}>Feed</Nav.Link>
                         {currentUser && (

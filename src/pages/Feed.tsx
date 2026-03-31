@@ -17,6 +17,7 @@ import PostCard from '../components/PostCard';
 import PostEditorModal from '../components/PostEditorModal';
 import PostViewModal from '../components/PostViewModal';
 import MasonryGrid from '../components/MasonryGrid';
+import { Pencil, Trash } from 'react-bootstrap-icons';
 
 const INITIAL_BATCH = 10;
 const LOAD_MORE_BATCH = 5;
@@ -123,6 +124,11 @@ function Feed() {
         void refreshFeedHeadRef.current();
     }, []);
 
+    const handleCloseEditor = useCallback(() => {
+        setActivePostId(null);
+        setIsUnsavedDraft(false);
+    }, []);
+
     const { editor, isReady, isDirty, isSaving, save, isEmpty, uploadImage } = usePostEditor({
         postId: activePostId,
         userId: currentUser?.uid ?? null,
@@ -135,6 +141,7 @@ function Feed() {
                 }
                 : null,
         onDraftSaved: handleDraftSaved,
+        onSaved: handleCloseEditor,
     });
 
     const loadMorePosts = useCallback(async () => {
@@ -232,11 +239,6 @@ function Feed() {
         }
     }, []);
 
-    const handleCloseEditor = () => {
-        setActivePostId(null);
-        setIsUnsavedDraft(false);
-    };
-
     const handleCloseView = () => setViewPostId(null);
 
     const handleExhibitUpdated = useCallback((postId: string, exhibit: number | undefined) => {
@@ -286,8 +288,8 @@ function Feed() {
     }));
 
     return (
-        <Container className="mt-4">
-            <Card className="text-center mb-4">
+        <Container className="mt-4 page-container">
+            <Card className="feed-hero-card text-center mb-4">
                 <Card.Body>
                     <div
                         className="mb-3 d-flex justify-content-center"
@@ -304,7 +306,7 @@ function Feed() {
                             {pfpUrl ? (
                                 <img
                                     src={pfpUrl}
-                                    alt="Dr. Moyer"
+                                    alt="Dr. Darilyn Moyer"
                                     width={150}
                                     height={150}
                                     onLoad={() => setPfpImageLoaded(true)}
@@ -325,32 +327,26 @@ function Feed() {
                             )}
                         </div>
                     </div>
-                    <Card.Title as="h1">Dr. Moyer's Tribute Board</Card.Title>
-                    <Card.Text>Welcome to the interactive tribute and recognition board!</Card.Text>
+                    <Card.Title as="h1">Dr. Darilyn Moyer's Tribute Board</Card.Title>
+                    <Card.Text>Welcome to her interactive tribute and recognition board!<br/>Please sign in and contribute your thoughts and memories.</Card.Text>
                     {currentUser ? (
                         <>
                             <div
                                 className="feed-member-guide text-start mx-auto mb-4 p-3 rounded bg-body-secondary bg-opacity-25"
                                 style={{ maxWidth: '36rem' }}
                             >
-                                <h2 className="h6 mb-3 text-center">How to use this board</h2>
                                 <ol className="small mb-0 ps-3">
                                     <li className="mb-2">
-                                        Click <strong>Create a Post</strong> to compose a recognition post.
+                                        Click <strong><span style={{ color: '#0d6efd' }}>Create a Post</span> below</strong> to compose a post.
                                     </li>
                                     <li className="mb-2">
-                                        Write your message with the toolbar: bold, lists, alignment, emojis, and{' '}
-                                        images.
+                                        Write your message (bold/italic, emojis and images are supported).
                                     </li>
                                     <li className="mb-2">
-                                        After you save, your post shows up here for everyone. Use the{' '}
-                                        <strong>pencil</strong> on your card to edit, or the <strong>trash</strong>{' '}
-                                        icon to delete your post.
+                                        After you save, your post is visible to everyone else. Use (<Pencil color="#0d6efd" size={14} />) on your post to edit, or (<Trash color="#dc3545" size={14} />) to delete your post.
                                     </li>
                                     <li className="mb-2">
-                                        Posts may be assigned to <strong>Exhibits</strong> by staff. You'll see which exhibit
-                                        (if any) your post is part of on your card. Visit the{' '}
-                                        <Link to="/exhibit">Exhibit</Link> page in the menu for the full curated tribute!
+                                        If you have questions, please contact the staff at <a href="mailto:tlin3247@gmail.com">tlin3247@gmail.com</a>.
                                     </li>
                                 </ol>
                             </div>
@@ -369,16 +365,16 @@ function Feed() {
                                     <Button variant="outline-primary">Sign Up</Button>
                                 </Link>
                             </div>
-                            <p className="text-muted small text-start mx-auto mt-4 mb-0" style={{ maxWidth: '36rem' }}>
-                                You can read every post here without an account. Create a free account or sign in to
-                                write your own recognition message. After you sign in, use the <strong>Exhibit</strong>{' '}
-                                link in the menu for the full curated tribute walkthrough.
+                            <p className="text-muted small center mx-auto mt-4 mb-0" style={{ maxWidth: '36rem' }}>
+                                You can read every post here without an account.<br/> Create a free account or sign in to
+                                write your own message.
                             </p>
                         </div>
                     )}
                 </Card.Body>
             </Card>
 
+            <Container>
             {feedRefreshSuggested && (
                 <div className="text-center mb-3">
                     <Button variant="outline-primary" size="sm" onClick={refreshFeedHead}>
@@ -457,6 +453,7 @@ function Feed() {
                 post={viewPost || null}
                 onClose={handleCloseView}
             />
+            </Container>
         </Container>
     );
 }

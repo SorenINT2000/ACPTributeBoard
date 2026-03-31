@@ -7,24 +7,48 @@
 
 /* CSS Custom Properties for Theming */
 :root {
-    /* Colors - Light Mode (default) */
-    --color-bg: #ffffff;
-    --color-bg-secondary: #f8f9fa;
-    --color-bg-tertiary: #e9ecef;
+    /* Typography — paired with Exhibit display type */
+    --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    --font-body: 'Source Sans 3', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        Oxygen, Ubuntu, Cantarell, sans-serif;
+
+    /* Colors - Light Mode (default) — warm paper neutrals + terracotta accent (#a63c1a) */
+    --color-bg: #fefcf8;
+    --color-bg-secondary: #f5f0e8;
+    --color-bg-tertiary: #ebe3d8;
     --color-text: #212529;
     --color-text-muted: #6c757d;
-    --color-border: #dee2e6;
-    --color-border-light: #e9ecef;
-    --color-link: #0d6efd;
-    --color-link-hover: #0a58ca;
-    --color-code-bg: #f8f9fa;
-    --color-card-bg: #ffffff;
-    --color-modal-bg: #ffffff;
-    --color-input-bg: #ffffff;
-    --color-navbar-bg: #f8f9fa;
+    --color-border: #e0d6ca;
+    --color-border-light: #eee8e0;
+    --color-link: #a63c1a;
+    --color-link-hover: #7f2e14;
+    --color-code-bg: #f8f4ee;
+    --color-card-bg: #fefcf8;
+    --color-modal-bg: #fefcf8;
+    --color-input-bg: #fffefb;
+    --color-navbar-bg: #f8f4ee;
+    --color-accent-primary: #A0CE66;
+    --color-accent-primary-hover: #8b3215;
+    /* Legacy alias — artifact accents, chapter borders (was indigo) */
+    --color-primary: var(--color-accent-primary);
+    /* Exhibit full-bleed bands (intro, page shell, outro) — warm umber, aligns with Feed */
+    --color-exhibit-hero-bg: #018067;
+    --color-exhibit-hero-bg-end: #018067;
 
-    /* Typography */
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    /* Bootstrap 5.3 — buttons, focus ring, link utilities */
+    --bs-primary: #a63c1a;
+    --bs-primary-rgb: 166, 60, 26;
+    --bs-link-color: #a63c1a;
+    --bs-link-hover-color: #7f2e14;
+    --bs-link-color-rgb: 166, 60, 26;
+    --bs-link-hover-color-rgb: 127, 46, 20;
+    --bs-body-font-family: var(--font-body);
+    --bs-body-bg: #fefcf8;
+    --bs-body-bg-rgb: 254, 252, 248;
+    --bs-secondary-bg: #f5f0e8;
+    --bs-tertiary-bg: #f8f4ee;
+    --bs-border-color: #e0d6ca;
+
     line-height: 1.5;
     font-weight: 400;
     color-scheme: light;
@@ -35,24 +59,6 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Dark Mode Colors — driven by ThemeProvider via data-bs-theme attribute */
-[data-bs-theme="dark"] {
-    --color-bg: #1a1a1a;
-    --color-bg-secondary: #212529;
-    --color-bg-tertiary: #343a40;
-    --color-text: #f8f9fa;
-    --color-text-muted: #adb5bd;
-    --color-border: #495057;
-    --color-border-light: #343a40;
-    --color-link: #6ea8fe;
-    --color-link-hover: #9ec5fe;
-    --color-code-bg: #343a40;
-    --color-card-bg: #212529;
-    --color-modal-bg: #212529;
-    --color-input-bg: #343a40;
-    --color-navbar-bg: #212529;
-}
-
 /* Base Styles */
 body {
     margin: 0;
@@ -60,6 +66,7 @@ body {
     min-height: 100vh;
     background-color: var(--color-bg);
     color: var(--color-text);
+    font-family: var(--font-body);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -75,6 +82,58 @@ a {
 
 a:hover {
     color: var(--color-link-hover);
+}
+
+.page-container {
+    margin: 0;
+    max-width: 100%;
+    padding: 0;
+}
+
+/* Feed hero — celebratory paper gradient + soft glow */
+.feed-hero-card.card {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse 85% 65% at 50% -10%, #E3E66C 0%, transparent 100%);
+    box-shadow: 0 0.125rem 0.35rem rgba(46, 32, 22, 0.07);
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid #E3E66C;
+    border-top: 1px solid #E3E66C;
+}
+
+.feed-hero-card.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        #E3E66C 50%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+    border: none;
+}
+
+.feed-hero-card .card-body {
+    position: relative;
+    z-index: 2;
+    
+    border: none;
+}
+
+.feed-hero-card .card-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    
+    border: none;
 }
 
 /* Sticky Navbar — hides on scroll down, reappears on scroll up */
@@ -146,8 +205,8 @@ nav a:hover {
 /* Main Content Area */
 main {
     padding: 0rem;
-    max-width: 1280px;
-    margin: 0 auto;
+    /* max-width: 1280px; */
+    margin: 0 0;
 }
 
 /* Posts Masonry Layout */
@@ -598,7 +657,7 @@ main {
    ======================================== */
 
 .exhibit-page {
-    background-color: var(--color-bg-dark, #0f172a);
+    background-color: var(--color-exhibit-hero-bg);
     min-height: 100vh;
 }
 
@@ -608,7 +667,11 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--color-bg-dark, #0f172a) 0%, #1e293b 100%);
+    background: linear-gradient(
+        135deg,
+        var(--color-exhibit-hero-bg) 0%,
+        var(--color-exhibit-hero-bg-end) 100%
+    );
     color: white;
     padding: 2rem;
     text-align: center;
@@ -618,13 +681,25 @@ main {
     max-width: 700px;
 }
 
+.exhibit-title-eyebrow {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.5vw, 1.5rem); 
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    background: linear-gradient(135deg, #fff 0%, #c8b8a8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0;
+}
+
 .exhibit-title {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 5vw, 3rem); 
     font-weight: 700;
     margin-bottom: 1.5rem;
-    letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+    letter-spacing: 0.1em;
+    background: linear-gradient(135deg, #fff 0%, #c8b8a8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -632,10 +707,14 @@ main {
 
 .exhibit-description {
     font-size: 1.25rem;
-    color: #94a3b8;
+    font-family: var(--font-display);
+    font-weight: 500;
     line-height: 1.8;
-    font-weight: 300;
+    /* increase distance between letters */
+    letter-spacing: 0.05em;
     margin-bottom: 3rem;
+    color: #ffffffc2;
+    /* text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5); */
 }
 
 .exhibit-stats {
@@ -653,24 +732,26 @@ main {
 }
 
 .exhibit-stat-number {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 3rem;
     font-weight: 700;
-    color: white;
+    color: #00ffccc2;
+    text-shadow: 3px 0px 0px rgba(0, 0, 0, 0.5);
 }
 
 .exhibit-stat-label {
     font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #64748b;
+    color: #ffffffc2;
     margin-top: 0.25rem;
+    /* text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5); */
 }
 
 .exhibit-scroll-hint {
     animation: bounce 2s infinite;
     font-size: 1rem;
-    color: #64748b;
+    color: #9d8f82;
     letter-spacing: 0.05em;
 }
 
@@ -765,7 +846,7 @@ main {
 }
 
 .parallax-title {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-display);
     font-size: clamp(1.5rem, 4vw, 3.25rem);
     font-weight: 700;
     color: white;
@@ -798,7 +879,7 @@ main {
 }
 
 .parallax-quote-text {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-display);
     font-size: clamp(0.85rem, 2vw, 1.25rem);
     font-style: italic;
     opacity: 0.9;
@@ -840,15 +921,6 @@ main {
     box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18);
 }
 
-[data-bs-theme="dark"] .exhibit-slide-image {
-    border-color: var(--color-border);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-
-[data-bs-theme="dark"] .exhibit-slide-image:hover {
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
-}
-
 /* Chapter Content Grid */
 .chapter-content {
     background-color: var(--color-bg);
@@ -856,7 +928,7 @@ main {
     z-index: 20;
     padding: 2rem 1.5rem;
     min-height: 50vh;
-    border-top: 6px solid var(--color-primary, #4f46e5);
+    border-top: 6px solid var(--color-accent-primary);
 }
 
 /* Chapter Masonry Layout */
@@ -1093,7 +1165,7 @@ main {
 .artifact-shadow {
     position: absolute;
     inset: 0;
-    background: var(--color-primary, #4f46e5);
+    background: var(--color-primary);
     border-radius: 12px;
     transform: translate(4px, 4px);
     transition: transform 0.3s ease;
@@ -1124,7 +1196,7 @@ main {
     position: relative;
     height: 280px;
     overflow: hidden;
-    background: var(--color-bg-secondary, #1e293b);
+    background: var(--color-bg-secondary, #f5f0e8);
 }
 
 .artifact-image {
@@ -1154,7 +1226,7 @@ main {
     padding: 1.25rem;
     border-radius: 50%;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    color: var(--color-primary, #4f46e5);
+    color: var(--color-primary);
 }
 
 .artifact-badge-container {
@@ -1190,11 +1262,11 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-bg-secondary, #1e293b);
+    background: var(--color-bg-secondary, #f5f0e8);
 }
 
 .artifact-badge {
-    background: var(--color-primary, #4f46e5);
+    background: var(--color-primary);
     color: white;
     font-size: 0.6875rem;
     font-weight: 700;
@@ -1246,7 +1318,7 @@ main {
 }
 
 .artifact-text {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 1.125rem;
     color: var(--color-text);
     line-height: 1.6;
@@ -1257,7 +1329,7 @@ main {
 .artifact-cta {
     margin-top: 1rem;
     font-size: 0.75rem;
-    color: var(--color-primary, #4f46e5);
+    color: var(--color-primary);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -1355,7 +1427,7 @@ main {
 }
 
 .artifact-modal-title {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-display);
     font-size: 2rem;
     font-weight: 700;
     color: var(--color-text);
@@ -1609,18 +1681,84 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-bg-dark, #0f172a);
+    background: linear-gradient(
+        180deg,
+        var(--color-exhibit-hero-bg-end) 0%,
+        var(--color-exhibit-hero-bg) 100%
+    );
     color: white;
     position: relative;
     z-index: 20;
 }
 
 .exhibit-outro-text {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: var(--font-display);
     font-size: clamp(1.5rem, 4vw, 2.5rem);
     font-style: italic;
     opacity: 0.9;
     margin: 0;
+}
+
+/* Bottom-of-page donation / legacy CTA (after outro) */
+.exhibit-legacy-cta {
+    position: relative;
+    z-index: 20;
+    background: var(--color-bg);
+    color: var(--color-text);
+    border-top: 1px solid var(--color-border);
+    padding: 2.5rem 1.25rem 3.25rem;
+}
+
+.exhibit-legacy-cta-inner {
+    max-width: 40rem;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.exhibit-legacy-cta-image {
+    display: block;
+    width: 100%;
+    max-width: 36rem;
+    height: auto;
+    margin: 0 auto 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(46, 32, 22, 0.12);
+    border: 1px solid var(--color-border-light);
+}
+
+.exhibit-legacy-cta-heading {
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.75rem;
+    color: var(--color-text);
+}
+
+.exhibit-legacy-cta-lead {
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    margin: 0;
+    color: var(--color-text);
+    max-width: 38rem;
+    margin-inline: auto;
+}
+
+.exhibit-legacy-cta-link {
+    font-weight: 600;
+    color: var(--color-link);
+    text-decoration: underline;
+    text-decoration-thickness: 0.06em;
+    text-underline-offset: 0.15em;
+}
+
+.exhibit-legacy-cta-link:hover {
+    color: var(--color-link-hover);
+}
+
+.exhibit-legacy-cta-org {
+    font-weight: 600;
+    color: var(--color-text);
 }
 
 /* Post Animation - Slide up and fade in */
