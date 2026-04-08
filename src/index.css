@@ -1294,6 +1294,44 @@ main {
     letter-spacing: 0.1em;
 }
 
+/*
+ * Editor modals use backdrop="static" + keyboard={false} so users dismiss via explicit
+ * actions (Cancel / Save). react-bootstrap briefly adds .modal-static on backdrop click
+ * or Escape; Bootstrap scales .modal-dialog while we shake .modal-content only (avoids
+ * breaking transitionEnd cleanup on the dialog node).
+ */
+@keyframes modal-guard-shake {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+    18% {
+        transform: translate3d(-8px, 0, 0);
+    }
+    36% {
+        transform: translate3d(8px, 0, 0);
+    }
+    54% {
+        transform: translate3d(-5px, 0, 0);
+    }
+    72% {
+        transform: translate3d(5px, 0, 0);
+    }
+    90% {
+        transform: translate3d(-2px, 0, 0);
+    }
+}
+
+.modal.modal-static .modal-content {
+    animation: modal-guard-shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal.modal-static .modal-content {
+        animation: none;
+    }
+}
+
 /* Artifact View Modal (react-bootstrap Modal + legacy class hooks) */
 .modal.artifact-modal-bs {
     z-index: 10050;
@@ -1450,13 +1488,13 @@ main {
 
 .artifact-gallery-header {
     margin-bottom: 1rem;
+    text-align: center;
 }
 
 .artifact-gallery-title {
     font-size: 1.25rem;
     font-weight: 600;
     margin: 0 0 0.25rem 0;
-    text-align: center;
 }
 
 .artifact-gallery-description {

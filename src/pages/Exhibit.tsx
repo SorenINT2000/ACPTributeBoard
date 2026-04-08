@@ -38,7 +38,7 @@ const EXHIBITS: ExhibitConfig[] = [
     {
         id: 'exhibit-3',
         exhibitNumber: 3,
-        title: 'Chapter Alignment, Sustainability, and Success',
+        title: 'College Alignment, Sustainability, and Success',
         subtitle: '',
         backgroundImage: '/exhibits/chapter.webp',
         quote: '"If you want to go fast, go alone; if you want to go far, go together."',
@@ -56,7 +56,7 @@ const EXHIBITS: ExhibitConfig[] = [
     {
         id: 'exhibit-5',
         exhibitNumber: 5,
-        title: 'Creating a Professional Home',
+        title: 'Membership Engagement and Creating a Professional Home',
         subtitle: '',
         backgroundImage: '/exhibits/bg-professional-home.webp',
         quote: '"Diversity is being invited to the party; Inclusion is being asked to dance."',
@@ -65,7 +65,7 @@ const EXHIBITS: ExhibitConfig[] = [
     {
         id: 'exhibit-6',
         exhibitNumber: 6,
-        title: 'Navigating the Pandemic',
+        title: 'About That Time There Was A Pandemic',
         subtitle: '',
         backgroundImage: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?auto=format&fit=crop&q=80&w=1600',
         quote: '"This pandemic has magnified every existing inequality in our society."',
@@ -83,7 +83,7 @@ const EXHIBITS: ExhibitConfig[] = [
     {
         id: 'exhibit-8',
         exhibitNumber: 8,
-        title: 'Legacy',
+        title: 'Legacy and Impact',
         subtitle: '',
         backgroundImage: '/exhibits/bg-legacy.webp',
         quote: '"If you\'re going to live, leave a legacy. Make a mark on the world that can\'t be erased."',

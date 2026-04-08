@@ -32,7 +32,13 @@ function PostEditorModal({
 }: PostEditorModalProps) {
 
     return (
-        <Modal show={show} onHide={onClose} size="lg">
+        <Modal
+            show={show}
+            onHide={onClose}
+            size="lg"
+            backdrop="static"
+            keyboard={false}
+        >
             <Modal.Header closeButton={false}>
                 <Modal.Title className="mb-0">
                     {activePost ? 'Edit Recognition Post' : 'Create Recognition Post'}

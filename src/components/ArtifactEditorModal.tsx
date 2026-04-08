@@ -189,8 +189,14 @@ function ArtifactEditorModal({ show, exhibitId, artifact, onClose, onSaved }: Ar
     };
 
     return (
-        <Modal show={show} onHide={onClose} size="lg">
-            <Modal.Header closeButton>
+        <Modal
+            show={show}
+            onHide={onClose}
+            size="lg"
+            backdrop="static"
+            keyboard={false}
+        >
+            <Modal.Header closeButton={false}>
                 <Modal.Title>
                     {isEditing ? 'Edit Artifact' : `Add Artifact to Exhibit ${exhibitId}`}
                 </Modal.Title>

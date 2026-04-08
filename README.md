@@ -116,6 +116,7 @@ Static fallback images are in `public/exhibits/`: `bg-wellbeing.webp`, `bg-advoc
 - Firebase Authentication (email/password + Google sign-in via popup) with protected routes for Exhibit/Admin
 - Public social feed (viewable without login) with hero card, guest onboarding blurb, member-only detailed instructions for non-staff users, paginated loading, and optional "feed may have changed" refresh banner (driven by newest-post id mismatch)
 - Rich text editor (TipTap) with formatting toolbar, image upload, emoji support, explicit Save only (no save-on-close)
+- **Post** and **artifact** editor modals use react-bootstrap `Modal` with `backdrop="static"` and `keyboard={false}` so only **Cancel** (or successful Save where applicable) closes them; backdrop click and Escape trigger Bootstrap’s brief `.modal-static` feedback plus a horizontal shake on `.modal-content` (see [`src/index.css`](src/index.css))
 - Exhibit page with 8 themed parallax sections
 - Exhibit parallax headers with auto-rotating image carousels (sourced from Firebase Storage) with static fallback images
 - Admin carousel editor modal for managing exhibit header images (upload, delete, filename-prefix ordering)
