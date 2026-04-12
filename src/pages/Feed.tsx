@@ -359,7 +359,7 @@ function Feed() {
                                         After you save, your post is visible to everyone else. Use (<Pencil color="#0d6efd" size={14} />) on your post to edit, or (<Trash color="#dc3545" size={14} />) to delete your post.
                                     </li>
                                     <li className="mb-2">
-                                        If you have questions, please contact the staff at <a href="mailto:yourinquiries@tutamail.com">tlin3247@gmail.com</a>.
+                                        If you have questions, please contact the staff at <a href="mailto:yourinquiries@tutamail.com">yourinquiries@tutamail.com</a>.
                                     </li>
                                 </ol>
                             </div>
