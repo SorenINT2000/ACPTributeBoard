@@ -66,36 +66,49 @@ function Navbar() {
 
                     <hr className="d-lg-none my-2 border-top" />
 
-                    <Nav className="align-items-lg-center navbar-user-section">
-                        {currentUser ? (
-                            <>
-                                <div className="d-flex align-items-center gap-2 px-3 py-2 px-lg-0 py-lg-0 me-lg-3 navbar-user-info">
-                                    <PersonCircle size={18} className="text-muted d-lg-none" />
-                                    {isHighLevel && (
-                                        <span
-                                            className="badge rounded-pill"
-                                            style={{ backgroundColor: '#6f42c1', fontSize: '0.7rem' }}
-                                            title="High-level user"
-                                        >
-                                            Staff
+                    <div className="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center ms-lg-auto navbar-user-and-credit">
+                        <Nav className="order-1 order-lg-2 align-items-lg-center navbar-user-section">
+                            {currentUser ? (
+                                <>
+                                    <div className="d-flex align-items-center gap-2 px-3 py-2 px-lg-0 py-lg-0 me-lg-3 navbar-user-info">
+                                        <PersonCircle size={18} className="text-muted d-lg-none" />
+                                        {isHighLevel && (
+                                            <span
+                                                className="badge rounded-pill"
+                                                style={{ backgroundColor: '#6f42c1', fontSize: '0.7rem' }}
+                                                title="High-level user"
+                                            >
+                                                Staff
+                                            </span>
+                                        )}
+                                        <span className="text-truncate" style={{ maxWidth: '200px' }}>
+                                            {currentUser.email}
                                         </span>
-                                    )}
-                                    <span className="text-truncate" style={{ maxWidth: '200px' }}>
-                                        {currentUser.email}
-                                    </span>
-                                </div>
-                                <Nav.Link
-                                    onClick={() => { closeDrawer(); handleSignOut(); }}
-                                    className="d-flex align-items-center gap-2"
-                                >
-                                    <BoxArrowRight size={16} className="d-lg-none" />
-                                    Sign Out
-                                </Nav.Link>
-                            </>
-                        ) : (
-                            <Nav.Link as={Link} to="/login" onClick={closeDrawer}>Log In</Nav.Link>
-                        )}
-                    </Nav>
+                                    </div>
+                                    <Nav.Link
+                                        onClick={() => { closeDrawer(); handleSignOut(); }}
+                                        className="d-flex align-items-center gap-2"
+                                    >
+                                        <BoxArrowRight size={16} className="d-lg-none" />
+                                        Sign Out
+                                    </Nav.Link>
+                                </>
+                            ) : (
+                                <Nav.Link as={Link} to="/login" onClick={closeDrawer}>Log In</Nav.Link>
+                            )}
+                        </Nav>
+                        <div className="navbar-credit-wrap order-2 order-lg-1 align-self-end align-self-lg-center text-end text-lg-start px-3 px-lg-0">
+                            <Nav.Link
+                                href="https://sorenschultz.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="navbar-credit-link py-2 py-lg-1"
+                                onClick={closeDrawer}
+                            >
+                                Website by Soren Schultz
+                            </Nav.Link>
+                        </div>
+                    </div>
                 </BootstrapNavbar.Collapse>
             </Container>
         </BootstrapNavbar>

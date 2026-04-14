@@ -182,6 +182,52 @@ a:hover {
     }
 }
 
+/* Developer credit in main app navbar — muted by default, accent on hover */
+.navbar-user-and-credit {
+    width: 100%;
+}
+
+@media (min-width: 992px) {
+    .navbar-user-and-credit {
+        width: auto;
+    }
+}
+
+.navbar-credit-link {
+    font-weight: 400;
+    font-size: 0.6875rem;
+    line-height: 1.3;
+    white-space: nowrap;
+    color: var(--color-text-muted) !important;
+}
+
+@media (min-width: 992px) {
+    .navbar-credit-link.nav-link {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .navbar-credit-wrap {
+        width: 100%;
+        padding-top: 0.5rem;
+        margin-top: 0.25rem;
+        border-top: 1px solid var(--color-border-light);
+    }
+
+    .navbar-credit-link {
+        white-space: normal;
+        display: inline-block;
+        max-width: 100%;
+    }
+}
+
+.navbar-credit-link:hover,
+.navbar-credit-link:focus {
+    color: var(--color-link) !important;
+}
+
 /* Navigation Styles */
 nav ul {
     list-style: none;

@@ -95,7 +95,7 @@ Static fallback images are in `public/exhibits/`: `bg-wellbeing.webp`, `bg-advoc
 1. `main.tsx` renders `<App />`.
 2. `App.tsx` wraps the app in `<AuthProvider>` and the `BrowserRouter`. [`index.html`](index.html) sets `data-bs-theme="light"` and `color-scheme: light` on `<html>` before paint.
 3. The feed (`/`) is publicly accessible. Protected routes (`/exhibit`) are wrapped in `<ProtectedRoute>`; `/admin` uses `<AdminRoute>` (requires `isHighLevel` claim).
-4. `Layout` component provides the `<Navbar>` and `<Outlet>` structure.
+4. `Layout` component provides the `<Navbar>` and `<Outlet>` structure. The navbar includes a small muted **Website by Soren Schultz** link (opens [sorenschultz.com](https://sorenschultz.com) in a new tab) so attribution stays reachable on long pages such as the Feed. On large screens it sits to the left of Log In / account; in the mobile drawer it is the last row, right-aligned, with a light top border.
 
 ## Firestore Security Rules
 
@@ -112,6 +112,7 @@ Static fallback images are in `public/exhibits/`: `bg-wellbeing.webp`, `bg-advoc
 ## Current State & Known Issues
 
 ### Implemented and Working
+- Navbar developer credit: external link to sorenschultz.com (`.navbar-credit-link`, ~11px type); desktop: left of account actions; mobile drawer: last row, right-aligned, `.navbar-credit-wrap` with top border; menu closes on click via `onClick`
 - Visual theme: light mode only; warm paper-style surfaces and terracotta primary; Playfair Display + Source Sans 3; Feed hero gradient (`.feed-hero-card`); Exhibit intro/outro and page shell use warm umber bands aligned with the same palette
 - Firebase Authentication (email/password + Google sign-in via popup) with protected routes for Exhibit/Admin
 - Public social feed (viewable without login) with hero card, guest onboarding blurb, member-only detailed instructions for non-staff users, paginated loading, and optional "feed may have changed" refresh banner (driven by newest-post id mismatch)
